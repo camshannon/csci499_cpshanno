@@ -32,7 +32,7 @@ void merge_sort(node* start, node* end) {
 
 void merge(node* start, node* end, node* middle) {
 	LinkedList temp;
-	node* i = start;
+	node* i =  start;
 	node* j = middle->next;
 	int k = 0;
 
