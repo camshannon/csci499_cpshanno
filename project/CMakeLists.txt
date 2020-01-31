@@ -1,7 +1,19 @@
+# Minimum CMake required
 cmake_minimum_required(VERSION 3.10.0)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-
+# Project
 project(project)
 
-add_executable
+# C++ Standard
+add_compile_options(-std=c++11)
+
+# Set gRPC CMake module
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+# https://stackoverflow.com/questions/6594796/how-do-i-make-cmake-output-into-a-bin-dir
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib) # Not useful in this example
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib) # Optional
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+add_subdirectory(protos)
+add_subdirectory(grpc)
