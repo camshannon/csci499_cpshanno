@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/warble_client.dir/warble_client.cc.o  -o ../../bin/warble_client -lwarble.grpc 
