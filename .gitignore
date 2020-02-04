@@ -15,3 +15,18 @@
 
 #ignore all grpc files
 **/grpc
+
+#ignore bin
+**/bin
+
+#ignore gens
+**/gens
+
+#ignore cmake find
+**/cmake
+
+#ignore pb.cc files
+**.pb.cc
+
+ignore pb.h files
+**.pb.h
