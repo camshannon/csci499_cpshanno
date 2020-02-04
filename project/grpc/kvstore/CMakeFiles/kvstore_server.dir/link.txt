@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/kvstore_server.dir/kvstore_server.cc.o  -o ../../bin/kvstore_server -lkvstore.grpc 
