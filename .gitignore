@@ -1,16 +1,16 @@
 # ignore all CMakeFiles
-**/CmakeFiles
+**/CMakeFiles
 
 # ignore all CMakeCache.txt
-**/CmakeCache.txt
+**/CMakeCache.txt
 
 #ignore all CMakeLists.txt
-**/CmakeLists.txt
+**/CMakeLists.txt
 
 # ignore all cmake_install.cmake
 **/cmake_install.cmake
 
-#ignore all MakeFile
+#ignore all Makefile
 **/Makefile
 
 #ignore all grpc files
