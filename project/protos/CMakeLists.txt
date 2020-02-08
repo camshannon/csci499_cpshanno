@@ -7,50 +7,28 @@ project(proto-generations)
 # Find required protobuf package
 find_package(Protobuf REQUIRED)
 
-# Add GRPC subdirectory
-add_subdirectory(../../grpc ${CMAKE_CURRENT_BINARY_DIR}/grpc EXCLUDE_FROM_ALL)
+# Find required GRPC package
+find_package(GRPC REQUIRED)
 
-# Use GRPC targets directly from build
-set(_PROTOBUF_LIBPROTOBUF libprotobuf)
-set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
-set(_GRPC_GRPCPP_UNSECURE grpc++_unsecure)
-set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
+# Get the filenames of all the proto files.
+file(GLOB PROTO_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 
-# Set protos list
-set(protos func kvstore warble)
-
-foreach(proto ${protos})
-  get_filename_component({proto}_proto "${proto}.proto" ABSOLUTE)
-	get_filename_component({proto}_proto_path "${${proto}_proto}" PATH)
-
-  # Generated proto sources
-	set(${proto}_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.pb.cc")
-  set(${proto}_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.pb.h")
-	set(${proto}_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.grpc.pb.cc")
-	set(${proto}_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.grpc.pb.h")
-	add_custom_command(
-    		OUTPUT "${${proto}_proto_srcs}" "${${proto}_proto_hdrs}" "${${proto}_grpc_srcs}" "${${proto}_grpc_hdrs}"
-      COMMAND ${_PROTOBUF_PROTOC}
-      ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
-        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-        -I "${${proto}_proto_path}"
-        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${${proto}_proto}"
-      DEPENDS "${${proto}_proto}")
+# Generate header and source files for all the proto files
+foreach(proto ${PROTO_FILES})
+    # Get filename without extension
+    get_filename_component(PROTO_NAME_WE ${proto} NAME_WE)
+    get_filename_component(PROTO_NAME ${proto} NAME)
+    # message(STATUS "Generating Protobuf Code for ${PROTO_NAME}")
+    protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} ${proto})
+    add_library(${PROTO_NAME_WE}.proto STATIC ${PROTO_SRCS} ${PROTO_HDRS})
+    target_include_directories(${PROTO_NAME_WE}.proto PUBLIC ${Protobuf_INCLUDE_DIRS})
+    # message(STATUS "Generating gRPC Code for ${PROTO_NAME}")
+    grpc_generate_cpp(GRPC_SRCS GRPC_HDRS ${CMAKE_CURRENT_BINARY_DIR} ${proto})
+    add_library(${PROTO_NAME_WE}.grpc STATIC ${GRPC_SRCS} ${GRPC_HDRS} ${PROTO_SRCS} ${PROTO_HDRS})
+    target_include_directories(${PROTO_NAME_WE}.grpc PUBLIC ${GRPC_INCLUDE_DIR})
+    # target_link_libraries(${PROTO_NAME_WE}.grpc gRPC::grpc++)
+    target_link_libraries(${PROTO_NAME_WE}.grpc gRPC::grpc++_reflection)
 endforeach()
 
-# Include generated *.pb.h files
-include_directories(${CMAKE_BINARY_DIR})
 
-#Targets
-foreach(_target
-  func_client func_server
-  kvstore_client kvstore_server
-  warble_client warble_server)
-  add_executable(${_target} "${_target}.cc"
-    ${hw_proto_srcs}
-    ${hw_grpc_srcs})
-  target_link_libraries(${_target}
-    ${_GRPC_GRPCPP_UNSECURE}
-    ${_PROTOBUF_LIBPROTOBUF})
-endforeach()
+
