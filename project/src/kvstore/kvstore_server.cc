@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <grpcpp/grpcpp.h>
+
 #include <grpc++/grpc++.h>
 
 #include "kvstore.grpc.pb.h"
@@ -10,6 +12,7 @@
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
+using grpc::ServerReaderWriter;
 using grpc::Status;
 
 using kvstore::PutRequest;
@@ -20,9 +23,35 @@ using kvstore::RemoveRequest;
 using kvstore::RemoveReply;
 using kvstore::KeyValueStore;
 
-class KVStoreServiceImpl final : public KeyValueStore::Service {
-	Status Put(ServerContext* context, const PutRequest* request, PutReply* reply) override {
+std::unordered_map<bytes, bytes> u_map;
 
+class KVStoreServiceImpl final : public KeyValueStore::Service {
+	Status get(ServerContext* context, ServerReaderWriter<GetReply, GetRequest> stream) override {
+		GetRequest request;
+		while(stream->Read(&request)) {
+			GetReply reply;
+			reply.set_value(u_map.find(request.key()));
+		}
+
+		return Status::OK;
+	}
+
+	Status put(ServerContext* context, ServerReaderWriter<PutReply, PutRequest>) override {
+		PutRequest request;
+		while(stream->Read(&request)) {
+			PutReply reply;
+			u_map.insert(request.key(), request.value());
+		}
+
+		return Status::OK;
+	}
+
+	Status remove(ServerContext* context, ServerReaderWriter<RemoveReply, RemoveRequest>) override {
+		RemoveRequest request;
+		while(stream->Read(&request)) {
+			RemoveReply reply;
+			u_map.remove(request.key());
+		}
 
 		return Status::OK;
 	}
@@ -44,5 +73,6 @@ void RunServer() {
 
 int main(int argc, char** argv) {
 	RunServer();
+
 	return 0;
 }
