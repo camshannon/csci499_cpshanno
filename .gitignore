@@ -25,6 +25,9 @@
 #ignore cmake files
 **/cmake
 
+#ignore .cmake files
+*.cmake
+
 #ignore pb.cc files
 **.pb.cc
 
@@ -44,13 +47,13 @@
 **.proto.a
 
 #ignore kvstore
-project/src/kvstore/kvstore
+project/cpp/kvstore/kvstore
 
 #ignore kvstore_server
-project/src/kvstore/kvstore_server
+project/cpp/kvstore/kvstore_server
 
 #ignore kvstore_client
-project/src/kvstore/kvstore_client
+project/cpp/kvstore/kvstore_client
 
 #ignore kvstore_test
-project/src/kvstore/kvstore_test
+project/cpp/kvstore/kvstore_test
