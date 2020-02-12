@@ -1,19 +1,19 @@
-# ignore all CMakeFiles
+# ignore CMakeFiles
 **/CMakeFiles
 
-# ignore all CMakeCache.txt
+# ignore CMakeCache.txt
 **/CMakeCache.txt
 
-#ignore all CMakeLists.txt
+#ignore CMakeLists.txt
 **/CMakeLists.txt
 
-# ignore all cmake_install.cmake
+# ignore cmake_install.cmake
 **/cmake_install.cmake
 
-#ignore all Makefile
+#ignore Makefiles
 **/Makefile
 
-#ignore all grpc files
+#ignore grpc files
 **/grpc
 
 #ignore bin
@@ -22,11 +22,23 @@
 #ignore gens
 **/gens
 
-#ignore cmake find
+#ignore cmake files
 **/cmake
 
 #ignore pb.cc files
 **.pb.cc
 
-ignore pb.h files
+#ignore pb.h files
 **.pb.h
+
+#ignore .grpc.pb.cc files
+**.grpc.pb.cc
+
+#ignore .grpc.pb.h files
+**.grpc.pb.h
+
+#ignore .grpc.a files
+**.grpc.a
+
+#ignore .proto.a files
+**.proto.a
