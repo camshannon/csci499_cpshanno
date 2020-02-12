@@ -42,3 +42,15 @@
 
 #ignore .proto.a files
 **.proto.a
+
+#ignore kvstore
+project/src/kvstore/kvstore
+
+#ignore kvstore_server
+project/src/kvstore/kvstore_server
+
+#ignore kvstore_client
+project/src/kvstore/kvstore_client
+
+#ignore kvstore_test
+project/src/kvstore/kvstore_test
