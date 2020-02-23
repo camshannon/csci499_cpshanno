@@ -1,6 +1,6 @@
 #include "kvstore_client.h"
 
-// put an element into the key value store
+// puts an element into the key value store
 void kvstore_client::KeyValueStoreClient::put(const std::string &key,
                                               const std::string &value) {
   PutRequest request;

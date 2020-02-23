@@ -14,14 +14,18 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
   GetRequest request;
   while (stream->Read(&request)) {
     GetReply reply;
-    try {
-      std::vector<std::string> v = kvstore_.Get(request.key());
-      for (int i = 0; i < v.size(); i++) {
-        reply.set_value(v[i]);
+    std::optional<std::vector<std::string>> values_from_key =
+        kvstore_.Get(request.key());
+    if (values_from_key) {
+      for (int i = 0; i < values_from_key->size(); i++) {
+        reply.set_value((*values_from_key)[i]);
         stream->Write(reply);
       }
-    } catch (std::exception &e) {
-      LOG(ERROR) << e.what();
+    } else {
+      LOG(ERROR) << "Key: " << request.key()
+                 << " not found in key value store.";
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    "Key: " + request.key() + " not found in key value store.");
     }
   }
   return Status::OK;

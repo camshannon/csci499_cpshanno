@@ -4,25 +4,25 @@
 
 TEST(KVStore, ElementNotFound) {
   kvstore::KVStore kvstore;
-  EXPECT_THROW(kvstore.get("key1"), std::invalid_argument);
+  EXPECT_EQ(kvstore.Get("key1"), std::nullopt);
 }
 
 TEST(KVStore, PuttingMultiple) {
   kvstore::KVStore kvstore;
-  kvstore.put("key1", "value1");
-  kvstore.put("key1", "value2");
-  kvstore.put("key1", "value3");
-  EXPECT_EQ(kvstore.get("key1")[0], "value1");
-  EXPECT_EQ(kvstore.get("key1")[1], "value2");
-  EXPECT_EQ(kvstore.get("key1")[2], "value3");
+  kvstore.Put("key1", "value1");
+  kvstore.Put("key1", "value2");
+  kvstore.Put("key1", "value3");
+  EXPECT_EQ((*kvstore.Get("key1"))[0], "value1");
+  EXPECT_EQ((*kvstore.Get("key1"))[1], "value2");
+  EXPECT_EQ((*kvstore.Get("key1"))[2], "value3");
 }
 
 TEST(KVStore, PutAndRemove) {
   kvstore::KVStore kvstore;
-  kvstore.put("key1", "value1");
-  EXPECT_EQ(kvstore.get("key1")[0], "value1");
-  kvstore.remove("key1");
-  EXPECT_THROW(kvstore.get("key1"), std::invalid_argument);
+  kvstore.Put("key1", "value1");
+  EXPECT_EQ((*kvstore.Get("key1"))[0], "value1");
+  kvstore.Remove("key1");
+  EXPECT_EQ(kvstore.Get("key1"), std::nullopt);
 }
 
 int main(int argc, char **argv) {

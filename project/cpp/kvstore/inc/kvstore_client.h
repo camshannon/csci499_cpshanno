@@ -26,7 +26,7 @@ public:
   KeyValueStoreClient(std::shared_ptr<Channel> channel)
       : stub_(KeyValueStore::NewStub(channel)) {}
 
-  // put an element into the key value store
+  // puts an element into the key value store
   void put(const std::string &key, const std::string &value);
 
   // gets a value from the key value store
@@ -36,6 +36,7 @@ public:
   void remove(const std::string &key);
 
 private:
+  // The client object making RPC calls to the kvstore server
   std::unique_ptr<KeyValueStore::Stub> stub_;
 };
 } // namespace kvstore_client
