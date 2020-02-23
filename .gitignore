@@ -4,8 +4,8 @@
 # ignore CMakeCache.txt
 **/CMakeCache.txt
 
-#ignore CMakeLists.txt
-**/CMakeLists.txt
+#ignore CTestTestfile.cmake
+**/CTestTestfile.cmake
 
 # ignore cmake_install.cmake
 **/cmake_install.cmake
@@ -45,9 +45,6 @@
 
 #ignore .proto.a files
 **.proto.a
-
-#ignore kvstore
-project/cpp/kvstore/kvstore
 
 #ignore kvstore_server
 project/cpp/kvstore/kvstore_server
