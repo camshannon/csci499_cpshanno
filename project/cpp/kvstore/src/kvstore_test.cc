@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../inc/kvstore.h"
+#include "kvstore.h"
 
 TEST(KVStore, ElementNotFound) {
   kvstore::KVStore kvstore;
@@ -25,7 +25,7 @@ TEST(KVStore, PutAndRemove) {
   EXPECT_THROW(kvstore.get("key1"), std::invalid_argument);
 }
 
-int main(int argc, char** argv) {
-	testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+int main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
