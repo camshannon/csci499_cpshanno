@@ -11,4 +11,4 @@ add_compile_options(-std=c++17)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 add_subdirectory(protos)
-add_subdirectory(src)
+add_subdirectory(cpp)
