@@ -1,38 +1,45 @@
 #include "func_server.h"
 
-// associates this type of event with the given function for future execution by Func
-Status func_server::FuncServiceImpl::hook(ServerContext *context, const HookRequest *request,
-            HookReply *reply) {
+// associates this type of event with the given function for future execution by
+// Func
+Status func_server::FuncServiceImpl::hook(ServerContext *context,
+                                          const HookRequest *request,
+                                          HookReply *reply) {
   func_.Hook(request->event_type(), request->event_function());
   return Status::OK;
 }
 
-// unregisters an event of the given type, if registered. has no effect if already unregistered.
-Status func_server::FuncServiceImpl::unhook(ServerContext *context, const UnhookRequest *request,
-              UnhookReply *reply) {
+// unregisters an event of the given type, if registered. has no effect if
+// already unregistered.
+Status func_server::FuncServiceImpl::unhook(ServerContext *context,
+                                            const UnhookRequest *request,
+                                            UnhookReply *reply) {
   func_.Unhook(request->event_type());
   return Status::OK;
 }
 
-// represents an arriving event of the given type with an arbitrary message payload
-Status func_server::FuncServiceImpl::event(ServerContext *context, const EventRequest *request,
-          EventReply *reply) {
+// represents an arriving event of the given type with an arbitrary message
+// payload
+Status func_server::FuncServiceImpl::event(ServerContext *context,
+                                           const EventRequest *request,
+                                           EventReply *reply) {
   std::optional<Any> any_from_event =
-        func_.Event(request->event_type(), request->payload());
-    if (any_from_event) {
-      reply->set_allocated_payload(&(*any_from_event));
-    }
-    else {
-      LOG(ERROR) << "Event: " << request->event_type()
-                 << " not found in event map.";
-      return Status(StatusCode::INVALID_ARGUMENT,
-                    "Event: " + std::to_string(request->event_type()) + " not found in event map.");
-    }
-    return Status::OK;
+      func_.Event(request->event_type(), request->payload());
+  if (any_from_event) {
+    reply->set_allocated_payload(&(*any_from_event));
+  } else {
+    LOG(ERROR) << "Event: " << request->event_type()
+               << " not found in event map.";
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  "Event: " + std::to_string(request->event_type()) +
+                      " not found in event map.");
+  }
+  return Status::OK;
 }
 
 // sets the pre-known map from function names to functions
-void func_server::FuncServiceImpl::SetFuncMap(const std::unordered_map<std::string, std::function<Any(Any)>>& func_map) {
+void func_server::FuncServiceImpl::SetFuncMap(
+    const std::unordered_map<std::string, std::function<Any(Any)>> &func_map) {
   func_.SetFuncMap(func_map);
 }
 

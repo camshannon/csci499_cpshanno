@@ -6,17 +6,17 @@
 
 #include "func.grpc.pb.h"
 
+using func::EventReply;
+using func::EventRequest;
+using func::FuncService;
+using func::HookReply;
+using func::HookRequest;
+using func::UnhookReply;
+using func::UnhookRequest;
+using google::protobuf::Any;
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-using google::protobuf::Any;
-using func::HookRequest;
-using func::HookReply;
-using func::UnhookRequest;
-using func::UnhookReply;
-using func::EventRequest;
-using func::EventReply;
-using func::FuncService;
 
 namespace func_client {
 
@@ -27,13 +27,16 @@ public:
   FuncServiceClient(std::shared_ptr<Channel> channel)
       : stub_(FuncService::NewStub(channel)) {}
 
-  // associates this type of event with the given function for future execution by Func
+  // associates this type of event with the given function for future execution
+  // by Func
   void hook(const int32_t &event_type, const std::string &event_function);
 
-  // unregisters an event of the given type, if registered.  has no effect if already unregistered.
+  // unregisters an event of the given type, if registered.  has no effect if
+  // already unregistered.
   void unhook(const int32_t &event_type);
 
-  // represents an arriving event of the given type with an arbitrary message payload
+  // represents an arriving event of the given type with an arbitrary message
+  // payload
   void event(const int32_t &event_type, Any &payload);
 
 private:

@@ -4,9 +4,7 @@
 
 using warble::Timestamp;
 
-Any Foo(const Any& any) {
-  return any;
-}
+Any Foo(const Any &any) { return any; }
 
 TEST(Func, ElementNotFound) {
   Timestamp timestamp;

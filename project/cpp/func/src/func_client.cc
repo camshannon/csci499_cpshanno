@@ -1,7 +1,9 @@
 #include "func_client.h"
 
-// associates this type of event with the given function for future execution by Func
-void func_client::FuncServiceClient::hook(const int32_t &event_type, const std::string &event_function) {
+// associates this type of event with the given function for future execution by
+// Func
+void func_client::FuncServiceClient::hook(const int32_t &event_type,
+                                          const std::string &event_function) {
   HookRequest request;
   request.set_event_type(event_type);
   request.set_event_function(event_function);
@@ -14,7 +16,8 @@ void func_client::FuncServiceClient::hook(const int32_t &event_type, const std::
   }
 }
 
-// unregisters an event of the given type, if registered.  has no effect if already unregistered.
+// unregisters an event of the given type, if registered.  has no effect if
+// already unregistered.
 void func_client::FuncServiceClient::unhook(const int32_t &event_type) {
   UnhookRequest request;
   request.set_event_type(event_type);
@@ -27,8 +30,10 @@ void func_client::FuncServiceClient::unhook(const int32_t &event_type) {
   }
 }
 
-// represents an arriving event of the given type with an arbitrary message payload
-void func_client::FuncServiceClient::event(const int32_t &event_type, Any &payload) {
+// represents an arriving event of the given type with an arbitrary message
+// payload
+void func_client::FuncServiceClient::event(const int32_t &event_type,
+                                           Any &payload) {
   EventRequest request;
   request.set_event_type(event_type);
   request.set_allocated_payload(&payload);
