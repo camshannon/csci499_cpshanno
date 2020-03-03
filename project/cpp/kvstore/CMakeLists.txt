@@ -21,7 +21,10 @@ set(CLT_SOURCES src/kvstore_client.cc)
 
 # Set sources for kvstore_test
 set(TST_SOURCES src/kvstore_test.cc src/kvstore.cc)
- 
+
+# Set executable path to bin folder
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/kvstore/bin)
+
 # Create kvstore_server executable
 add_executable(kvstore_server ${SRV_SOURCES})
 target_link_libraries(kvstore_server PUBLIC kvstore.grpc)

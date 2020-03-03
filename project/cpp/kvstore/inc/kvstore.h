@@ -1,6 +1,5 @@
 #include <iterator>
 #include <optional>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -10,13 +9,13 @@ namespace kvstore {
 // the key value store
 class KVStore {
 public:
-  // puts a key value pair into the unordered map
+  // puts a key value pair into kvstore_map_
   void Put(const std::string &key, const std::string &value);
 
-  // gets all values for a key from the unordered map
+  // gets all values for a key from kvstore_map_
   std::optional<std::vector<std::string>> Get(const std::string &key);
 
-  // removes all values with a key from the unordered map
+  // removes all values with a key from kvstore_map_
   void Remove(const std::string &key);
 
 private:

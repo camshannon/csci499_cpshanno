@@ -43,5 +43,6 @@ private:
   kvstore::KVStore kvstore_;
 };
 
+// runs the server on port 50000
 void RunServer();
 } // namespace kvstore_server
