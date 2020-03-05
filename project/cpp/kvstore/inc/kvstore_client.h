@@ -22,7 +22,7 @@ namespace kvstore_client {
 // the key value store client
 class KeyValueStoreClient {
 public:
-  // key value store constructor
+  // key value store client constructor
   KeyValueStoreClient(std::shared_ptr<Channel> channel)
       : stub_(KeyValueStore::NewStub(channel)) {}
 
