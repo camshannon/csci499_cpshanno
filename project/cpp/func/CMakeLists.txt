@@ -11,7 +11,11 @@ find_package(glog 0.4.0 REQUIRED)
 find_package(GTest REQUIRED)
 
 #Include headers 
-include_directories(${CMAKE_BINARY_DIR}/cpp/func/inc)
+include_directories(
+${CMAKE_BINARY_DIR}/cpp/func/inc
+${CMAKE_BINARY_DIR}/cpp/warble/inc
+${CMAKE_BINARY_DIR}/cpp/kvstore/inc)
+
 
 # Set sources for func_server
 set(SRV_SOURCES src/func_server.cc src/func.cc)

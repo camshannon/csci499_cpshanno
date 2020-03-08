@@ -18,7 +18,7 @@ namespace func {
 class Func {
 public:
   // puts a new element into func_map_ or updates the value at event_type
-  void Hook(const int32_t &event_type, const std::string &event_function);
+  void Hook(const int32_t &event_type, const std::string &request_function, const std::string &reply_function);
 
   // removes the element with event_type if registered
   void Unhook(const int32_t &event_type);
@@ -28,12 +28,12 @@ public:
 
   // sets the pre-known map from function names to functions
   void SetFuncMap(
-      const std::unordered_map<std::string, std::function<Any(Any)>> &func_map);
+        const std::unordered_map<std::string, std::pair<std::function<std::vector<std::tuple<int, std::string, std::string>>(Any)>, function<Any(std::string)>>> &func_map_);
 
 private:
   // The unordered map for storing hooked events
   std::unordered_map<int32_t, std::function<Any(Any)>> event_map_;
   // The unordered map for associating function names with functions
-  std::unordered_map<std::string, std::function<Any(Any)>> func_map_;
+  std::unordered_map<std::string, std::pair<std::function<std::vector<std::tuple<int, std::string, std::string>>(Any)>, function<Any(std::string)>>> func_map_;
 };
 } // namespace func

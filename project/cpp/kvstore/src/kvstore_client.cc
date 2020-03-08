@@ -16,27 +16,26 @@ void kvstore_client::KeyValueStoreClient::put(const std::string &key,
 }
 
 // gets a value from the key value store
-std::vector<std::string>
-kvstore_client::KeyValueStoreClient::get(const std::vector<std::string> &keys) {
+std::optional<std::vector<std::string>>
+kvstore_client::KeyValueStoreClient::get(const std::string &key) {
   ClientContext context;
   auto stream = stub_->get(&context);
   std::vector<std::string> values;
-  for (const auto &key : keys) {
-    GetRequest request;
-    request.set_key(key);
-    stream->Write(request);
-    GetReply reply;
-    stream->Read(&reply);
-    values.push_back(reply.value());
-    LOG(INFO) << key << " : " << reply.value();
-  }
+  GetRequest request;
+  request.set_key(key);
+  stream->Write(request);
+  GetReply reply;
+  stream->Read(&reply);
+  values.push_back(reply.value());
+  LOG(INFO) << key << " : " << reply.value();
   stream->WritesDone();
   Status status = stream->Finish();
   if (status.ok()) {
-    return values;
+    return {values};
   } else {
     LOG(ERROR) << status.error_code() << ": " << status.error_message();
     LOG(ERROR) << "RPC failed";
+    return {};
   }
 }
 

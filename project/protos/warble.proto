@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/any.proto";
+
 package warble;
 
 // Time as given by Linux gettimeofday().

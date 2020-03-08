@@ -10,6 +10,9 @@ find_package(glog 0.4.0 REQUIRED)
 # Find GTest
 find_package(GTest REQUIRED)
 
+# Find Protobuf
+find_package(Protobuf REQUIRED)
+
 #Include headers 
 include_directories(${CMAKE_BINARY_DIR}/cpp/warble/inc)
 
@@ -21,3 +24,8 @@ set(TST_SOURCES src/warble_test.cc src/warble.cc)
 
 # Set executable path to bin folder
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/warble/bin)
+
+# Create warble_test executable
+add_executable(warble_test ${TST_SOURCES})
+target_link_libraries(warble_test PUBLIC GTest::GTest)
+add_test(warble_test warble_test)

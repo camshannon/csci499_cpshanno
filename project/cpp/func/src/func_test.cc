@@ -1,12 +1,15 @@
 #include <gtest/gtest.h>
 
 #include "func.h"
+#include "warble.h"
 
 using warble::Timestamp;
 
-Any Foo(const Any &any) { return any; }
+TEST(Func, Hook) {
 
-TEST(Func, ElementNotFound) {
+}
+
+TEST(Func, SetFuncMap) {
   Timestamp timestamp;
   timestamp.set_seconds(0);
   timestamp.set_useconds(1);
