@@ -4,11 +4,11 @@
 #include <vector>
 #include <chrono>
 #include <tuple>
+#include <functional>
 
 #include <glog/logging.h>
-#include <grpcpp/grpcpp.h>
 
-#include "warble.grpc.pb.h"
+#include "warble.pb.h"
 
 using warble::Timestamp;
 using warble::RegisteruserRequest;
@@ -34,7 +34,7 @@ public:
 
   // gets the func_map
   // @return the func_map from string to pairs of request and reply functions
-  const std::unordered_map<std::string, std::pair<std::function<std::vector<std::tuple<int, std::string, std::string>>(Any)>, function<Any(std::vector<std::vector<std::string>>)>>>& getFuncMap();
+  const std::unordered_map<std::string, std::pair<std::function<std::vector<std::tuple<int, std::string, std::string>>(Any)>, std::function<Any(std::vector<std::vector<std::string>>)>>>& getFuncMap();
 
   // receives a register user request as an any and packages it for func
   // @param: the any containing the register user request
@@ -112,7 +112,7 @@ public:
 private:
   // the unordered map for associating function names with functions
   //  function names map to request function and reply function
-  std::unordered_map<std::string, std::pair<std::function<std::vector<std::tuple<int, std::string, std::string>>(Any)>, function<Any(std::vector<std::vector<std::string>>)>>> func_map_;
+  std::unordered_map<std::string, std::pair<std::function<std::vector<std::tuple<int, std::string, std::string>>(Any)>, std::function<Any(std::vector<std::vector<std::string>>)>>> func_map_;
   // a counter for the warble id
   int warble_count_;
 };

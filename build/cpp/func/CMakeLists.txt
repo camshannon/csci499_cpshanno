@@ -13,7 +13,6 @@ find_package(GTest REQUIRED)
 #Include headers 
 include_directories(
 ${CMAKE_BINARY_DIR}/cpp/func/inc
-${CMAKE_BINARY_DIR}/cpp/warble/inc
 ${CMAKE_BINARY_DIR}/cpp/kvstore/inc)
 
 

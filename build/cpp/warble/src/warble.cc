@@ -17,21 +17,18 @@ const std::unordered_map<std::string, std::pair<std::function<std::vector<std::t
   // receives a register user request as an any and packages it for func
   const std::vector<std::tuple<int, std::string, std::string>>& warble::WarbleFunctions::RegisteruserRequest(const Any& any) {
     RegisteruserRequest request;
-    any.unpackTo(&request);
-    std::tuple<int, std::string, std::string>> user_for_storage = std::make_tuple(0, request.username(), request.username());
-    std::tuple<int, std::string, std::string>> user_following_for_storage = std::make_tuple(0, request.username() + "_following", request.username());
-    std::tuple<int, std::string, std::string>> user_followers_for_storage = std::make_tuple(0, request.username() + "_followers", request.username());
-    std::vector<std::tuple<int, std::string, std::string>> user_vector;
-    user_vector.push_back(user_for_storage);
-    user_vector.push_back(user_following_for_storage);
-    user_vector.push_back(user_followers_for_storage);
+    any.UnpackTo(&request);
+    const auto &user_for_storage = std::make_tuple(0, request.username(), request.username());
+    const auto &user_following_for_storage = std::make_tuple(0, request.username() + "_following", request.username());
+    const atuo &user_followers_for_storage = std::make_tuple(0, request.username() + "_followers", request.username());
+    std::vector<std::tuple<int, std::string, std::string>> user_vector{user_for_storage, user_following_for_storage, user_followers_for_storage};
     return user_vector;
   }
 
   // receives a placeholder 2D vector and returns the register user reply
   const Any& warble_functions::WarbleFunctions::RegisteruserReply(const std::vector<std::vector<std::string>>& registeruser_output) {
     RegisteruserReply reply;
-    any.packFrom(reply);
+    any.PackFrom(reply);
     return any;
   }
 
