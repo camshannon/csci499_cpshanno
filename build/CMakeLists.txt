@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10.0)
 project(build)
 
 # C++ Standard
-add_compile_options(-std=c++17)
+add_compile_options(-std=c++17 -Wall -g)
 
 # Set gRPC CMake module
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
