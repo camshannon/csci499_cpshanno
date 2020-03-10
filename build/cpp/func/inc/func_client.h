@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
 
+#include "func.pb.h"
 #include "func.grpc.pb.h"
 
 using func::EventReply;

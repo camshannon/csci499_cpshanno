@@ -31,7 +31,6 @@ TEST(WarbleFunctions, RegisteruserReplyPackager) {
 TEST(WarbleFunctions, WarbleRequestPackagerNoParent) {
   WarbleRequest request;
   Warble warble;
-  Warble parent_warble;
   Any any;
   request.set_username("username_0");
   request.set_text("Text for user_0");

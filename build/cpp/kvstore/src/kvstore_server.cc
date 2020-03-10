@@ -4,6 +4,7 @@
 Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      const PutRequest *request,
                                                      PutReply *reply) {
+  LOG(INFO) << "Put for key: " << request->key() << " and value: " << request->value() << " in key value store commenced";
   kvstore_.Put(request->key(), request->value());
   return Status::OK;
 }
@@ -11,15 +12,19 @@ Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
 // gets a value from the key value store
 Status kvstore_server::KeyValueStoreServiceImpl::get(
     ServerContext *context, ServerReaderWriter<GetReply, GetRequest> *stream) {
+  LOG(INFO) << "Get in key value store commenced";
   GetRequest request;
   while (stream->Read(&request)) {
     GetReply reply;
+    LOG(INFO) << "Getting value for key: " << request.key();
     std::optional<std::vector<std::string>> values_from_key =
         kvstore_.Get(request.key());
     if (values_from_key) {
-      for (int i = 0; i < values_from_key->size(); i++) {
+      LOG(INFO) << "Key was found. Writing to stream commenced";
+      for (unsigned int i = 0; i < values_from_key->size(); i++) {
         reply.set_value((*values_from_key)[i]);
         stream->Write(reply);
+        return Status::OK;
       }
     } else {
       LOG(ERROR) << "Key: " << request.key()
@@ -34,6 +39,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
 // removes a value from the key value store
 Status kvstore_server::KeyValueStoreServiceImpl::remove(
     ServerContext *context, const RemoveRequest *request, RemoveReply *reply) {
+  LOG(INFO) << "Remove in key value store commenced";
   kvstore_.Remove(request->key());
   return Status::OK;
 }

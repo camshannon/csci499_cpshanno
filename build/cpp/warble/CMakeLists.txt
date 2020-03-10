@@ -13,8 +13,8 @@ find_package(GTest REQUIRED)
 # Find Protobuf
 find_package(Protobuf REQUIRED)
 
-#Include headers 
-include_directories(${CMAKE_BINARY_DIR}/cpp/warble/inc)
+# Include header directory
+include_directories(inc)
 
 # Set headers for warble_test
 set(TST_HDRS inc/warble_functions.h

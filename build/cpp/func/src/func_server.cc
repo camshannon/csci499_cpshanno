@@ -23,11 +23,12 @@ Status func_server::FuncServiceImpl::unhook(ServerContext *context,
 Status func_server::FuncServiceImpl::event(ServerContext *context,
                                            const EventRequest *request,
                                            EventReply *reply) {
-  std::optional<Any> any_from_event =
+  const auto &optional_any =
       func_.Event(request->event_type(), request->payload());
-  if (any_from_event) {
-    reply->set_allocated_payload(&(*any_from_event));
-  } else {
+  if (optional_any) {
+    *reply->mutable_payload() = *optional_any;
+  } 
+  else {
     LOG(ERROR) << "Event: " << request->event_type()
                << " not found in event map.";
     return Status(StatusCode::INVALID_ARGUMENT,
@@ -39,7 +40,11 @@ Status func_server::FuncServiceImpl::event(ServerContext *context,
 
 // sets the pre-known map from function names to functions
 void func_server::FuncServiceImpl::SetFuncMap(
-    const std::unordered_map<std::string, std::function<Any(Any)>> &func_map) {
+    const std::unordered_map<
+    std::string,
+    std::pair<std::function<
+                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
+              std::function<Any(std::vector<std::vector<std::string>>)>>> &func_map) {
   func_.SetFuncMap(func_map);
 }
 

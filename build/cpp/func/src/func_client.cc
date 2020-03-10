@@ -17,7 +17,7 @@ void func_client::FuncServiceClient::hook(const int32_t &event_type,
 }
 
 // unregisters an event of the given type, if registered.  has no effect if
-// already unregistered.
+// already unregistered
 void func_client::FuncServiceClient::unhook(const int32_t &event_type) {
   UnhookRequest request;
   request.set_event_type(event_type);
@@ -32,18 +32,20 @@ void func_client::FuncServiceClient::unhook(const int32_t &event_type) {
 
 // represents an arriving event of the given type with an arbitrary message
 // payload
-void func_client::FuncServiceClient::event(const int32_t &event_type,
+std::optional<Any> func_client::FuncServiceClient::event(const int32_t &event_type,
                                            Any &payload) {
   EventRequest request;
   request.set_event_type(event_type);
-  request.set_allocated_payload(&payload);
+  *request.mutable_payload() = payload;
   EventReply reply;
   ClientContext context;
   Status status = stub_->event(&context, request, &reply);
   if (!status.ok()) {
     LOG(ERROR) << status.error_code() << ": " << status.error_message();
     LOG(ERROR) << "RPC failed";
+    return {};
   }
+  return {reply.payload()};
 }
 
 int main(int argc, char **argv) {

@@ -30,7 +30,7 @@ public:
   void put(const std::string &key, const std::string &value);
 
   // gets a value from the key value store
-  std::vector<std::string> get(const std::vector<std::string> &keys);
+  const std::optional<std::vector<std::string>> get(const std::string &key);
 
   // removes an element from the key value store
   void remove(const std::string &key);

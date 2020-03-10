@@ -16,7 +16,7 @@ void kvstore_client::KeyValueStoreClient::put(const std::string &key,
 }
 
 // gets a value from the key value store
-std::optional<std::vector<std::string>>
+const std::optional<std::vector<std::string>>
 kvstore_client::KeyValueStoreClient::get(const std::string &key) {
   ClientContext context;
   auto stream = stub_->get(&context);
@@ -52,6 +52,7 @@ void kvstore_client::KeyValueStoreClient::remove(const std::string &key) {
   }
 }
 
+/*
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   LOG(INFO) << "Main commenced";
@@ -60,8 +61,9 @@ int main(int argc, char **argv) {
   client.put("key1", "value1");
   client.put("key2", "value2");
   client.put("key3", "value3");
-  std::vector<std::string> keys = {"key1", "key2", "key3"};
-  client.get(keys);
+  client.get("key1");
+  client.get("key2");
+  client.get("key3");
   client.remove("key1");
-  client.get(keys);
 }
+*/
