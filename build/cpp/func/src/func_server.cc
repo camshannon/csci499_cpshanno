@@ -49,10 +49,17 @@ void func_server::FuncServiceImpl::SetFuncMap(
 }
 
 // runs the server on port 50000
-void func_server::RunServer() {
+void func_server::RunServer(
+    const std::unordered_map<
+        std::string,
+        std::pair<std::function<std::vector<
+                      std::tuple<int, std::string, std::string>>(Any)>,
+                  std::function<Any(std::vector<std::vector<std::string>>)>>>
+        &func_map) {
   LOG(INFO) << "Run server commenced";
   std::string server_address("0.0.0.0:50000");
   FuncServiceImpl service;
+  service.SetFuncMap(func_map);
   ServerBuilder builder;
   LOG(INFO) << "Service declared";
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -60,11 +67,4 @@ void func_server::RunServer() {
   std::unique_ptr<Server> server(builder.BuildAndStart());
   LOG(INFO) << "Server listening on " << server_address;
   server->Wait();
-}
-
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  LOG(INFO) << "Main commenced";
-  func_server::RunServer();
-  return 0;
 }

@@ -59,10 +59,3 @@ void kvstore_server::RunServer() {
   LOG(INFO) << "Server listening on " << server_address;
   server->Wait();
 }
-
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  LOG(INFO) << "Main commenced";
-  kvstore_server::RunServer();
-  return 0;
-}

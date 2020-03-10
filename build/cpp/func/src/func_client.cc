@@ -47,10 +47,3 @@ func_client::FuncServiceClient::event(const int32_t &event_type, Any &payload) {
   }
   return {reply.payload()};
 }
-
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  LOG(INFO) << "Main commenced";
-  func_client::FuncServiceClient client(grpc::CreateChannel(
-      "localhost:50000", grpc::InsecureChannelCredentials()));
-}
