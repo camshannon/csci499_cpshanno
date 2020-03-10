@@ -37,11 +37,12 @@ public:
 
   // sets the pre-known map from function names to functions
   void SetFuncMap(
-        const std::unordered_map<
-    std::string,
-    std::pair<std::function<
-                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
-              std::function<Any(std::vector<std::vector<std::string>>)>>> &func_map);
+      const std::unordered_map<
+          std::string,
+          std::pair<std::function<std::vector<
+                        std::tuple<int, std::string, std::string>>(Any)>,
+                    std::function<Any(std::vector<std::vector<std::string>>)>>>
+          &func_map);
 
 private:
   // the func for the for server

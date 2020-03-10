@@ -13,9 +13,12 @@ TEST(Func, HookandUnhook) {
   Any any;
   request.set_username("username_0");
   any.PackFrom(request);
-  EXPECT_EQ(std::get<1>((func.GetEventMap().at(0).first)(any)[0]), std::get<1>(warble_functions::WarbleFunctions::RegisteruserRequestPackager(any)[0]));
+  EXPECT_EQ(std::get<1>((func.GetEventMap().at(0).first)(any)[0]),
+            std::get<1>(
+                warble_functions::WarbleFunctions::RegisteruserRequestPackager(
+                    any)[0]));
   func.Unhook(0);
-  const auto& it = func.GetEventMap().find(0);
+  const auto &it = func.GetEventMap().find(0);
   EXPECT_EQ(it, func.GetEventMap().end());
 }
 
@@ -30,7 +33,7 @@ TEST(Func, PutEvent) {
   Any any;
   request.set_username("username_0");
   any.PackFrom(request);
-  const auto& optional_any = func.Event(0, any);
+  const auto &optional_any = func.Event(0, any);
   EXPECT_TRUE(optional_any->UnpackTo(&reply));
 }
 
@@ -45,7 +48,7 @@ TEST(Func, GetEvent) {
   Any any;
   request.set_username("username_0");
   any.PackFrom(request);
-  const auto& optional_any = func.Event(0, any);
+  const auto &optional_any = func.Event(0, any);
   optional_any->UnpackTo(&reply);
   EXPECT_EQ(reply.following()[0], "username_0");
   EXPECT_EQ(reply.followers()[0], "username_0");

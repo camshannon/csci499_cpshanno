@@ -32,8 +32,8 @@ void func_client::FuncServiceClient::unhook(const int32_t &event_type) {
 
 // represents an arriving event of the given type with an arbitrary message
 // payload
-std::optional<Any> func_client::FuncServiceClient::event(const int32_t &event_type,
-                                           Any &payload) {
+std::optional<Any>
+func_client::FuncServiceClient::event(const int32_t &event_type, Any &payload) {
   EventRequest request;
   request.set_event_type(event_type);
   *request.mutable_payload() = payload;

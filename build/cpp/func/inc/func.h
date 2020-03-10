@@ -8,10 +8,10 @@
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
 
-#include "func.pb.h"
 #include "func.grpc.pb.h"
-#include "kvstore.pb.h"
+#include "func.pb.h"
 #include "kvstore.grpc.pb.h"
+#include "kvstore.pb.h"
 #include "kvstore_client.h"
 
 using google::protobuf::Any;
@@ -24,6 +24,9 @@ public:
   // func constructor
   Func();
 
+  // func destructor
+  ~Func();
+
   // puts a new element into func_map_ or updates the value at event_type
   void Hook(const int32_t &event_type, const std::string &event_function);
 
@@ -35,32 +38,40 @@ public:
 
   // sets the pre-known map from function names to functions
   void SetFuncMap(
-        const   std::unordered_map<
-      std::string,
-      std::pair<std::function<std::vector<
-                    std::tuple<int, std::string, std::string>>(Any)>,
-                std::function<Any(std::vector<std::vector<std::string>>)>>> &func_map);
+      const std::unordered_map<
+          std::string,
+          std::pair<std::function<std::vector<
+                        std::tuple<int, std::string, std::string>>(Any)>,
+                    std::function<Any(std::vector<std::vector<std::string>>)>>>
+          &func_map);
 
   // gets the event map
   //  for testing purposes
-  std::unordered_map<int32_t, std::pair<std::function<std::vector<
+  std::unordered_map<
+      int32_t,
+      std::pair<std::function<std::vector<
                     std::tuple<int, std::string, std::string>>(Any)>,
-                std::function<Any(std::vector<std::vector<std::string>>)>>> GetEventMap();
+                std::function<Any(std::vector<std::vector<std::string>>)>>>
+  GetEventMap();
 
   // sets the key value store client for storage
   void SetKVStoreClient();
 
 private:
   // the unordered map for storing hooked events
-  std::unordered_map<int32_t, std::pair<std::function<std::vector<
+  std::unordered_map<
+      int32_t,
+      std::pair<std::function<std::vector<
                     std::tuple<int, std::string, std::string>>(Any)>,
-                std::function<Any(std::vector<std::vector<std::string>>)>>> event_map_;
+                std::function<Any(std::vector<std::vector<std::string>>)>>>
+      event_map_;
   // the unordered map for associating function names with functions
   std::unordered_map<
       std::string,
       std::pair<std::function<std::vector<
                     std::tuple<int, std::string, std::string>>(Any)>,
-                std::function<Any(std::vector<std::vector<std::string>>)>>> func_map_;
+                std::function<Any(std::vector<std::vector<std::string>>)>>>
+      func_map_;
   // the kvstore client for calls to our backend
   kvstore_client::KeyValueStoreClient *kvstore_client_;
 };
