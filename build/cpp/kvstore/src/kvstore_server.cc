@@ -60,11 +60,9 @@ void kvstore_server::RunServer() {
   server->Wait();
 }
 
-/*
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
-  LOG(INFO) << "Main commenced";
-  
+  LOG(INFO) << "kvstore_server main commenced";
+  kvstore_server::RunServer();
   return 0;
 }
-*/

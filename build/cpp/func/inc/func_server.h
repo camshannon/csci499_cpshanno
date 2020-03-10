@@ -1,4 +1,5 @@
 #include "func.h"
+#include "warble_functions.h"
 
 using func::EventReply;
 using func::EventRequest;

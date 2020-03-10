@@ -45,6 +45,9 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
       if (optional_values) {
         values = *optional_values;
       }
+      else {
+        return {};
+      }
     }
     // remove request
     else if (request_type == 2) {

@@ -21,13 +21,9 @@ ${CMAKE_BINARY_DIR}/cpp/warble/inc)
 
 # Set headers for cmd
 set(WRBL_HDRS
-	${CMAKE_BINARY_DIR}/cpp/func/inc/func.h
 	${CMAKE_BINARY_DIR}/cpp/func/inc/func_client.h
-	${CMAKE_BINARY_DIR}/cpp/func/inc/func_server.h
 	${CMAKE_BINARY_DIR}/cpp/kvstore/inc/kvstore.h
 	${CMAKE_BINARY_DIR}/cpp/kvstore/inc/kvstore_client.h
-	${CMAKE_BINARY_DIR}/cpp/kvstore/inc/kvstore_server.h
-	${CMAKE_BINARY_DIR}/cpp/warble/inc/warble_functions.h
 	${CMAKE_BINARY_DIR}/gen/func.pb.h
 	${CMAKE_BINARY_DIR}/gen/func.grpc.pb.h
 	${CMAKE_BINARY_DIR}/gen/kvstore.pb.h
@@ -36,13 +32,9 @@ set(WRBL_HDRS
 
 # Set sources for main
 set(WRBL_SRCS src/main.cc
-	${CMAKE_BINARY_DIR}/cpp/func/src/func.cc
 	${CMAKE_BINARY_DIR}/cpp/func/src/func_client.cc
-	${CMAKE_BINARY_DIR}/cpp/func/src/func_server.cc
 	${CMAKE_BINARY_DIR}/cpp/kvstore/src/kvstore.cc
 	${CMAKE_BINARY_DIR}/cpp/kvstore/src/kvstore_client.cc
-	${CMAKE_BINARY_DIR}/cpp/kvstore/src/kvstore_server.cc
-	${CMAKE_BINARY_DIR}/cpp/warble/src/warble_functions.cc
 	${CMAKE_BINARY_DIR}/gen/func.pb.cc
 	${CMAKE_BINARY_DIR}/gen/func.grpc.pb.cc
 	${CMAKE_BINARY_DIR}/gen/kvstore.pb.cc

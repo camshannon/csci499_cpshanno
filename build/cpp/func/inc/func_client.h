@@ -38,7 +38,7 @@ public:
 
   // represents an arriving event of the given type with an arbitrary message
   // payload
-  std::optional<Any> event(const int32_t &event_type, Any &payload);
+  const std::optional<Any> event(const int32_t &event_type, const Any &payload);
 
 private:
   // The client object making RPC calls to the func server
