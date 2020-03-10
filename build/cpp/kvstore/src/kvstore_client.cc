@@ -12,6 +12,8 @@ void kvstore_client::KeyValueStoreClient::put(const std::string &key,
   if (!status.ok()) {
     LOG(ERROR) << status.error_code() << ": " << status.error_message();
     LOG(ERROR) << "RPC failed";
+  } else {
+    LOG(INFO) << "Put successful";
   }
 }
 
@@ -31,6 +33,7 @@ kvstore_client::KeyValueStoreClient::get(const std::string &key) {
   stream->WritesDone();
   Status status = stream->Finish();
   if (status.ok()) {
+    LOG(INFO) << "Get succesful";
     return {values};
   } else {
     LOG(ERROR) << status.error_code() << ": " << status.error_message();
@@ -49,21 +52,7 @@ void kvstore_client::KeyValueStoreClient::remove(const std::string &key) {
   if (!status.ok()) {
     LOG(ERROR) << status.error_code() << ": " << status.error_message();
     LOG(ERROR) << "RPC failed";
+  } else {
+    LOG(INFO) << "Remove successful";
   }
 }
-
-/*
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  LOG(INFO) << "Main commenced";
-  kvstore_client::KeyValueStoreClient client(grpc::CreateChannel(
-      "localhost:50001", grpc::InsecureChannelCredentials()));
-  client.put("key1", "value1");
-  client.put("key2", "value2");
-  client.put("key3", "value3");
-  client.get("key1");
-  client.get("key2");
-  client.get("key3");
-  client.remove("key1");
-}
-*/

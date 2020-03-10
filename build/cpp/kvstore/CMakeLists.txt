@@ -38,6 +38,8 @@ set(SRV_SRCS src/kvstore_server.cc
 	${CMAKE_BINARY_DIR}/gen/kvstore.pb.cc
 	${CMAKE_BINARY_DIR}/gen/kvstore.grpc.pb.cc)
 
+# Set headers for kvstore_test
+
 # Set sources for kvstore_test
 set(TST_SRCS src/kvstore_test.cc
 	src/kvstore.cc)
@@ -58,6 +60,6 @@ target_link_libraries(kvstore_client PUBLIC gRPC::grpc++
 	glog::glog)
 
 # Create kvstore_test executable
-add_executable(kvstore_test ${TST_SRCS})
+add_executable(kvstore_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(kvstore_test PUBLIC GTest::GTest
 	glog::glog)

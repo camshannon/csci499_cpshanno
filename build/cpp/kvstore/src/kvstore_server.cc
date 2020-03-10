@@ -4,7 +4,9 @@
 Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      const PutRequest *request,
                                                      PutReply *reply) {
-  LOG(INFO) << "Put for key: " << request->key() << " and value: " << request->value() << " in key value store commenced";
+  LOG(INFO) << "Put for key: " << request->key()
+            << " and value: " << request->value()
+            << " in key value store commenced";
   kvstore_.Put(request->key(), request->value());
   return Status::OK;
 }
