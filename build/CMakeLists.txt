@@ -10,11 +10,5 @@ add_compile_options(-std=c++17)
 # Set gRPC CMake module
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-# Find required protobuf package
-find_package(Protobuf REQUIRED)
-
-# Find required GRPC package
-find_package(GRPC REQUIRED)
-
 # Add cpp subdirectory for building
 add_subdirectory(cpp)

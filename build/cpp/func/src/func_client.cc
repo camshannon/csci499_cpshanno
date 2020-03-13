@@ -30,8 +30,7 @@ void func_client::FuncServiceClient::unhook(const int32_t &event_type) {
   ClientContext context;
   Status status = stub_->unhook(&context, request, &reply);
   if (!status.ok()) {
-    LOG(ERROR) << status.error_code() << ": " << status.error_message();
-    LOG(ERROR) << "RPC failed";
+    LOG(INFO) << status.error_code() << ": " << status.error_message();
   }
   else {
     LOG(INFO) << "Successful unhook";
@@ -50,8 +49,7 @@ func_client::FuncServiceClient::event(const int32_t &event_type, const Any &payl
   ClientContext context;
   Status status = stub_->event(&context, request, &reply);
   if (!status.ok()) {
-    LOG(ERROR) << status.error_code() << ": " << status.error_message();
-    LOG(ERROR) << "RPC failed";
+    LOG(INFO) << status.error_code() << ": " << status.error_message();
     return {};
   }
   LOG(INFO) << "Successful event";

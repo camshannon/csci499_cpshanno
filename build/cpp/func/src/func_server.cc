@@ -5,6 +5,7 @@
 Status func_server::FuncServiceImpl::hook(ServerContext *context,
                                           const HookRequest *request,
                                           HookReply *reply) {
+  LOG(INFO) << "Hook commenced in func_server";
   func_.Hook(request->event_type(), request->event_function());
   return Status::OK;
 }
@@ -14,6 +15,7 @@ Status func_server::FuncServiceImpl::hook(ServerContext *context,
 Status func_server::FuncServiceImpl::unhook(ServerContext *context,
                                             const UnhookRequest *request,
                                             UnhookReply *reply) {
+  LOG(INFO) << "Unhook commenced in func_server";
   func_.Unhook(request->event_type());
   return Status::OK;
 }
@@ -23,16 +25,17 @@ Status func_server::FuncServiceImpl::unhook(ServerContext *context,
 Status func_server::FuncServiceImpl::event(ServerContext *context,
                                            const EventRequest *request,
                                            EventReply *reply) {
+  LOG(INFO) << "Event commenced in func_server";
   const auto &optional_any =
       func_.Event(request->event_type(), request->payload());
   if (optional_any) {
     *reply->mutable_payload() = *optional_any;
   } else {
-    LOG(ERROR) << "Event: " << request->event_type()
-               << " not found in event map.";
+    LOG(ERROR) << "Event " << request->event_type()
+               << " failed to retrieve output.";
     return Status(StatusCode::INVALID_ARGUMENT,
-                  "Event: " + std::to_string(request->event_type()) +
-                      " not found in event map.");
+                  "Event " + std::to_string(request->event_type()) +
+                      " failed to retrieve output.");
   }
   return Status::OK;
 }
@@ -45,6 +48,7 @@ void func_server::FuncServiceImpl::SetFuncMap(
                       std::tuple<int, std::string, std::string>>(Any)>,
                   std::function<Any(std::vector<std::vector<std::string>>)>>>
         &func_map) {
+  LOG(INFO) << "Set func map commenced in func_server";
   func_.SetFuncMap(func_map);
 }
 

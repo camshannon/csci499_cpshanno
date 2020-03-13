@@ -1,5 +1,6 @@
 #include <iterator>
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -13,7 +14,7 @@ public:
   void Put(const std::string &key, const std::string &value);
 
   // gets all values for a key from kvstore_map_
-  std::optional<std::vector<std::string>> Get(const std::string &key);
+  const std::optional<std::vector<std::string>> Get(const std::string &key);
 
   // removes all values with a key from kvstore_map_
   void Remove(const std::string &key);

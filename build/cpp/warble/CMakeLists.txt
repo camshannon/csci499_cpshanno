@@ -16,6 +16,9 @@ find_package(Protobuf REQUIRED)
 # Include header directory
 include_directories(inc)
 
+# Set executable path to bin folder
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/warble/bin)
+
 # Set headers for warble_test
 set(TST_HDRS inc/warble_functions.h
 	${CMAKE_BINARY_DIR}/gen/warble.pb.cc)
@@ -24,9 +27,6 @@ set(TST_HDRS inc/warble_functions.h
 set(TST_SRCS src/warble_test.cc 
 	src/warble_functions.cc
 	${CMAKE_BINARY_DIR}/gen/warble.pb.cc)
-
-# Set executable path to bin folder
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/warble/bin)
 
 # Create warble_test executable
 add_executable(warble_test ${TST_HDRS} ${TST_SRCS})

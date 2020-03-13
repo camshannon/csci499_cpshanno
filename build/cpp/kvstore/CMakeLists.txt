@@ -13,18 +13,11 @@ find_package(GTest REQUIRED)
 # Find Protobuf
 find_package(Protobuf REQUIRED)
 
+# Find gRPC
+find_package(GRPC REQUIRED)
+
 #Include headers 
 include_directories(inc)
-
-# Set headers for kvstore_client
-set(CLT_HDRS inc/kvstore_client.h
-	${CMAKE_BINARY_DIR}/gen/kvstore.pb.h
-	${CMAKE_BINARY_DIR}/gen/kvstore.grpc.pb.h)
-
-# Set sources for kvstore_client
-set(CLT_SRCS src/kvstore_client.cc
-	${CMAKE_BINARY_DIR}/gen/kvstore.pb.cc
-	${CMAKE_BINARY_DIR}/gen/kvstore.grpc.pb.cc)
 
 # Set headers for kvstore_server
 set(SRV_HDRS inc/kvstore_server.h
@@ -50,12 +43,6 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/kvstore/bin)
 # Create kvstore_server executable
 add_executable(kvstore_server ${SRV_HDRS} ${SRV_SRCS})
 target_link_libraries(kvstore_server PUBLIC gRPC::grpc++
-	${PROTOBUF_LIBRARY}
-	glog::glog)
-
-# Create kvstore_client executable
-add_executable(kvstore_client ${CLT_HDRS} ${CLT_SRCS})
-target_link_libraries(kvstore_client PUBLIC gRPC::grpc++
 	${PROTOBUF_LIBRARY}
 	glog::glog)
 

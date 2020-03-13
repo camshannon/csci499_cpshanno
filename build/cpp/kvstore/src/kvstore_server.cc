@@ -4,8 +4,8 @@
 Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      const PutRequest *request,
                                                      PutReply *reply) {
-  LOG(INFO) << "Put for key: " << request->key()
-            << " and value: " << request->value()
+  LOG(INFO) << "Put for key " << request->key()
+            << " and value " << request->value()
             << " in key value store commenced";
   kvstore_.Put(request->key(), request->value());
   return Status::OK;
@@ -19,7 +19,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
   while (stream->Read(&request)) {
     GetReply reply;
     LOG(INFO) << "Getting value for key: " << request.key();
-    std::optional<std::vector<std::string>> values_from_key =
+    const auto &values_from_key =
         kvstore_.Get(request.key());
     if (values_from_key) {
       LOG(INFO) << "Key was found. Writing to stream commenced";
