@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10.0)
 project(func-component)
 
 # Find glog
-find_package(glog 0.4.0 REQUIRED)
+find_package(glog REQUIRED)
 
 # Find GTest
 find_package(GTest REQUIRED)
