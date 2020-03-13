@@ -23,7 +23,7 @@ using warble::WarbleReply;
 using warble::WarbleRequest;
 
 namespace cmd {
-  // the command line tools
+// the command line tools
 class CommandLine {
 public:
   // command line tools constructor
@@ -43,25 +43,31 @@ public:
   // @return: true if warble exists, else false
   bool CheckWarble(const int64_t &id);
 
+  // checks if a user already follows another user
+  // @return: true if the user does not already follow, else false
+  bool CheckFollow(const std::string &username, const std::string &to_follow);
+
   // registers the user with the username
-  void RegisterUser(const std::string& username);
+  void RegisterUser(const std::string &username);
 
   // creates the warble with username, text, and parent_id
-  void Warble(const std::string& username, const std::string& text, const int64_t &parent_id);
-  
+  void Warble(const std::string &username, const std::string &text,
+              const int64_t &parent_id);
+
   // follows a user
-  void Follow(const std::string& username, const std::string& to_follow);
-  
+  void Follow(const std::string &username, const std::string &to_follow);
+
   // recursively reads a thread starting from a warble
-  void Read(const int64_t& id);
+  void Read(const int64_t &id);
 
   // shows a user's followers and following
-  void Profile(const std::string& username);
+  void Profile(const std::string &username);
+
 private:
   // helper function to recurse through thread
-  void ReadHelper(const int64_t& id, int count);
+  void ReadHelper(const int64_t &id, int count);
 
-  //the func client for making calls to server
+  // the func client for making calls to server
   func_client::FuncServiceClient *func_client_;
 };
 } // namespace cmd

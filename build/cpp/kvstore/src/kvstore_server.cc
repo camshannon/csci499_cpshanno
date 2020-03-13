@@ -4,9 +4,8 @@
 Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      const PutRequest *request,
                                                      PutReply *reply) {
-  LOG(INFO) << "Put for key " << request->key()
-            << " and value " << request->value()
-            << " in key value store commenced";
+  LOG(INFO) << "Put for key " << request->key() << " and value "
+            << request->value() << " in key value store commenced";
   kvstore_.Put(request->key(), request->value());
   return Status::OK;
 }
@@ -16,24 +15,21 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
     ServerContext *context, ServerReaderWriter<GetReply, GetRequest> *stream) {
   LOG(INFO) << "Get in key value store commenced";
   GetRequest request;
-  while (stream->Read(&request)) {
-    GetReply reply;
-    LOG(INFO) << "Getting value for key: " << request.key();
-    const auto &values_from_key =
-        kvstore_.Get(request.key());
-    if (values_from_key) {
-      LOG(INFO) << "Key was found. Writing to stream commenced";
-      for (unsigned int i = 0; i < values_from_key->size(); i++) {
-        reply.set_value((*values_from_key)[i]);
-        stream->Write(reply);
-        return Status::OK;
-      }
-    } else {
-      LOG(ERROR) << "Key: " << request.key()
-                 << " not found in key value store.";
-      return Status(StatusCode::INVALID_ARGUMENT,
-                    "Key: " + request.key() + " not found in key value store.");
+  GetReply reply;
+  stream->Read(&request);
+  LOG(INFO) << "Getting value for key " << request.key();
+  const auto &values = kvstore_.Get(request.key());
+  if (values) {
+    LOG(INFO) << "Key " << request.key()
+              << " was found. Writing to stream commenced";
+    for (unsigned int i = 0; i < values->size(); i++) {
+      reply.set_value((*values)[i]);
+      stream->Write(reply);
     }
+  } else {
+    LOG(ERROR) << "Key " << request.key() << " not found in key value store.";
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  "Key " + request.key() + " not found in key value store.");
   }
   return Status::OK;
 }

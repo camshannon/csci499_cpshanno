@@ -1,7 +1,9 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <mutex>
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 
@@ -74,5 +76,7 @@ private:
       func_map_;
   // the kvstore client for calls to our backend
   kvstore_client::KeyValueStoreClient *kvstore_client_;
+  // the mutex for obtaining locks on the unordered map
+  mutable std::shared_mutex mutex_;
 };
 } // namespace func

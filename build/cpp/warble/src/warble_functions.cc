@@ -89,7 +89,7 @@ warble_functions::WarbleFunctions::WarbleRequestPackager(const Any &any) {
       puts.push_back(warble_put);
     } else {
       LOG(INFO) << "WarbleRequest packaged with non-empty parent_id";
-      const auto &warble_put = std::forward_as_tuple(
+      const auto &warble_put = std::make_tuple(
           0, "warble_" + std::to_string(warble_count_), serialized_warble);
       const auto &parent_put =
           std::make_tuple(0, "warble_" + warble.parent_id(), serialized_warble);

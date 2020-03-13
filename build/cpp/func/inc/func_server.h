@@ -52,10 +52,10 @@ private:
 
 // runs the server on port 50000
 void RunServer(
-      const std::unordered_map<
-          std::string,
-          std::pair<std::function<std::vector<
-                        std::tuple<int, std::string, std::string>>(Any)>,
-                    std::function<Any(std::vector<std::vector<std::string>>)>>>
-          &func_map);
+    const std::unordered_map<
+        std::string,
+        std::pair<std::function<std::vector<
+                      std::tuple<int, std::string, std::string>>(Any)>,
+                  std::function<Any(std::vector<std::vector<std::string>>)>>>
+        &func_map);
 } // namespace func_server
