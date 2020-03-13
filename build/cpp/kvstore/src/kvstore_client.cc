@@ -27,9 +27,9 @@ kvstore_client::KeyValueStoreClient::get(const std::string &key) {
   request.set_key(key);
   stream->Write(request);
   GetReply reply;
-  stream->Read(&reply);
-  values.push_back(reply.value());
-  LOG(INFO) << key << " : " << reply.value();
+  while (stream->Read(&reply)) {
+    values.push_back(reply.value());
+  }
   stream->WritesDone();
   Status status = stream->Finish();
   if (status.ok()) {

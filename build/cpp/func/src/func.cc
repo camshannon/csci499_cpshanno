@@ -12,6 +12,7 @@ func::Func::~Func() { delete kvstore_client_; }
 // puts a new element into func_map_ or updates the value at event_type
 void func::Func::Hook(const int32_t &event_type,
                       const std::string &event_function) {
+  std::unique_lock lock(mutex_);
   const auto &it = func_map_.find(event_function);
   if (it != func_map_.end()) {
     event_map_[event_type] = it->second;
@@ -20,12 +21,14 @@ void func::Func::Hook(const int32_t &event_type,
 
 // removes the element with event_type if registered
 void func::Func::Unhook(const int32_t &event_type) {
+  std::unique_lock lock(mutex_);
   event_map_.erase(event_type);
 }
 
 // executes the request and reply functions with the specified event type
 const std::optional<Any> func::Func::Event(const int32_t &event_type,
                                            const Any &payload) {
+  std::shared_lock lock(mutex_);
   const auto &storage_requests = (event_map_[event_type].first)(payload);
   std::vector<std::vector<std::string>> result;
   for (const auto &storage_request : storage_requests) {
@@ -44,8 +47,7 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
       // if key was found, set value vector to the found value
       if (optional_values) {
         values = *optional_values;
-      }
-      else {
+      } else {
         return {};
       }
     }

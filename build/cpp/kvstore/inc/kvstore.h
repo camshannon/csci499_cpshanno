@@ -1,4 +1,5 @@
 #include <iterator>
+#include <mutex>
 #include <optional>
 #include <shared_mutex>
 #include <string>
@@ -20,7 +21,10 @@ public:
   void Remove(const std::string &key);
 
 private:
-  // The unordered map for storing the key value pair
+  // the unordered map for storing the key value pair
   std::unordered_map<std::string, std::vector<std::string>> kvstore_map_;
+
+  // the mutex for obtaining locks on the unordered map
+  mutable std::shared_mutex mutex_;
 };
 } // namespace kvstore
