@@ -22,12 +22,6 @@
 #ignore gens
 **/gens
 
-#ignore cmake files
-**/cmake
-
-#ignore .cmake files
-*.cmake
-
 #ignore pb.cc files
 **.pb.cc
 
