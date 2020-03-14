@@ -31,5 +31,5 @@ set(TST_SRCS src/warble_test.cc
 # Create warble_test executable
 add_executable(warble_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(warble_test PUBLIC GTest::GTest 
-	glog::glog
+	glog
 	${PROTOBUF_LIBRARY})

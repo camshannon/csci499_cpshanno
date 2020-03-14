@@ -66,12 +66,12 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/func/bin)
 # Create func_server executable
 add_executable(func_server ${SRV_HDRS} ${SRV_SRCS})
 target_link_libraries(func_server PUBLIC gRPC::grpc++
-	glog::glog
+	glog
 	${PROTOBUF_LIBRARY})
 
 # Create func_test executable
 add_executable(func_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(func_test PUBLIC gRPC::grpc++
 	GTest::GTest 
-	glog::glog
+	glog
 	${PROTOBUF_LIBRARY})
