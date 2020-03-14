@@ -56,5 +56,5 @@ set(EXECUTABLE_OUTPUT_PATH bin)
 add_executable(warble ${WRBL_HDRS} ${WRBL_SRCS})
 target_link_libraries(warble PUBLIC gRPC::grpc++
 	gflags
-	glog
+	glog::glog
 	${PROTOBUF_LIBRARY})

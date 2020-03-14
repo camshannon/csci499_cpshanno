@@ -44,9 +44,9 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/kvstore/bin)
 add_executable(kvstore_server ${SRV_HDRS} ${SRV_SRCS})
 target_link_libraries(kvstore_server PUBLIC gRPC::grpc++
 	${PROTOBUF_LIBRARY}
-	glog)
+	glog::glog)
 
 # Create kvstore_test executable
 add_executable(kvstore_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(kvstore_test PUBLIC GTest::GTest
-	glog)
+	glog::glog)
