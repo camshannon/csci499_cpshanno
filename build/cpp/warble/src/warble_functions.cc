@@ -14,21 +14,21 @@ const std::unordered_map<
         {"Profile",
          std::make_pair(ProfileRequestPackager, ProfileReplyPackager)}};
 
-int warble_functions::WarbleFunctions::warble_count_ = 0;
+int warble_functions::warble_count_ = 0;
 
 const std::unordered_map<
     std::string,
     std::pair<std::function<
                   std::vector<std::tuple<int, std::string, std::string>>(Any)>,
               std::function<Any(std::vector<std::vector<std::string>>)>>> &
-warble_functions::WarbleFunctions::GetFuncMap() {
+warble_functions::GetFuncMap() {
   LOG(INFO) << "func_map_ retrieval commenced";
   return func_map_;
 }
 
 // receives a register user request as an any and packages it for func
 const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::RegisteruserRequestPackager(const Any &any) {
+warble_functions::RegisteruserRequestPackager(const Any &any) {
   LOG(INFO) << "RegisteruserRequest packaging commenced";
   RegisteruserRequest request;
   any.UnpackTo(&request);
@@ -42,7 +42,7 @@ warble_functions::WarbleFunctions::RegisteruserRequestPackager(const Any &any) {
 }
 
 // receives a placeholder 2D vector and returns the register user reply
-const Any warble_functions::WarbleFunctions::RegisteruserReplyPackager(
+const Any warble_functions::RegisteruserReplyPackager(
     const std::vector<std::vector<std::string>> &result) {
   LOG(INFO) << "RegisteruserReply packaging commenced";
   RegisteruserReply reply;
@@ -54,7 +54,7 @@ const Any warble_functions::WarbleFunctions::RegisteruserReplyPackager(
 // processes a warble request, assigns an id and timestamp, and
 // returns the id, and serialized warble message
 const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::WarbleRequestPackager(const Any &any) {
+warble_functions::WarbleRequestPackager(const Any &any) {
   LOG(INFO) << "WarbleRequest packaging commenced";
   WarbleRequest request;
   // the below line is causing me memory leaks when testing with valgrind
@@ -108,7 +108,7 @@ warble_functions::WarbleFunctions::WarbleRequestPackager(const Any &any) {
 }
 
 // receives a warble and packages it in a warble reply for the frontend
-const Any warble_functions::WarbleFunctions::WarbleReplyPackager(
+const Any warble_functions::WarbleReplyPackager(
     const std::vector<std::vector<std::string>> &result) {
   LOG(INFO) << "WarbleReply packaging commenced";
   Warble warble;
@@ -122,7 +122,7 @@ const Any warble_functions::WarbleFunctions::WarbleReplyPackager(
 
 // receives a follow request as an any and packages it for func
 const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::FollowRequestPackager(const Any &any) {
+warble_functions::FollowRequestPackager(const Any &any) {
   LOG(INFO) << "FollowRequest packaging commenced";
   FollowRequest request;
   any.UnpackTo(&request);
@@ -136,7 +136,7 @@ warble_functions::WarbleFunctions::FollowRequestPackager(const Any &any) {
 }
 
 // receives a placeholder 2D vector and returns the follow reply
-const Any warble_functions::WarbleFunctions::FollowReplyPackager(
+const Any warble_functions::FollowReplyPackager(
     const std::vector<std::vector<std::string>> &result) {
   LOG(INFO) << "FollowReply packaging commenced";
   FollowReply reply;
@@ -147,7 +147,7 @@ const Any warble_functions::WarbleFunctions::FollowReplyPackager(
 
 // receives a follow request as an any and packages it for func
 const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::ReadRequestPackager(const Any &any) {
+warble_functions::ReadRequestPackager(const Any &any) {
   LOG(INFO) << "ReadRequest packaging commenced";
   ReadRequest request;
   any.UnpackTo(&request);
@@ -158,7 +158,7 @@ warble_functions::WarbleFunctions::ReadRequestPackager(const Any &any) {
 }
 
 // receives a vector containing all the warbles in reply to the requested warble
-const Any warble_functions::WarbleFunctions::ReadReplyPackager(
+const Any warble_functions::ReadReplyPackager(
     const std::vector<std::vector<std::string>> &result) {
   LOG(INFO) << "ReadReply packaging commenced";
   ReadReply reply;
@@ -176,7 +176,7 @@ const Any warble_functions::WarbleFunctions::ReadReplyPackager(
 
 // receives a profile request as an any and packages it for func
 const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::ProfileRequestPackager(const Any &any) {
+warble_functions::ProfileRequestPackager(const Any &any) {
   LOG(INFO) << "ProfileRequest packaging commenced";
   ProfileRequest request;
   any.UnpackTo(&request);
@@ -191,7 +191,7 @@ warble_functions::WarbleFunctions::ProfileRequestPackager(const Any &any) {
 
 // receives a vector containing the two vectors of the user's followers and
 // followings
-const Any warble_functions::WarbleFunctions::ProfileReplyPackager(
+const Any warble_functions::ProfileReplyPackager(
     const std::vector<std::vector<std::string>> &result) {
   LOG(INFO) << "ProfileReply packaging commenced";
   ProfileReply reply;
