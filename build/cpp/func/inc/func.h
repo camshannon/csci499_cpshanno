@@ -20,7 +20,7 @@ using google::protobuf::Any;
 
 namespace func {
 
-// the func hooker, unhooker, and event executor
+// the key value store
 class Func {
 public:
   // func constructor
