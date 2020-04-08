@@ -22,7 +22,7 @@ TEST(Func, HookandUnhook) {
 
 // test put event
 //  uses register user event for testing
-TEST(Func, PutEvent1) {
+TEST(Func, PutEvent) {
   func::Func func;
   func.SetFuncMap(warble_functions::func_map);
   func.Hook(0, "Registeruser");
