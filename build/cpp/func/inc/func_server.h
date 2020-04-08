@@ -18,7 +18,7 @@ using grpc::StatusCode;
 
 namespace func_server {
 
-// the key value store server
+// the func server
 class FuncServiceImpl final : public FuncService::Service {
 public:
   // associates this type of event with the given function for future execution

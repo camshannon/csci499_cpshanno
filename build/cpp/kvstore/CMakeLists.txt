@@ -16,6 +16,9 @@ find_package(Protobuf REQUIRED)
 # Find gRPC
 find_package(GRPC REQUIRED)
 
+# Find GFlags
+find_package(gflags REQUIRED)
+
 #Include headers 
 include_directories(inc)
 
@@ -44,7 +47,8 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/kvstore/bin)
 add_executable(kvstore_server ${SRV_HDRS} ${SRV_SRCS})
 target_link_libraries(kvstore_server PUBLIC gRPC::grpc++
 	${PROTOBUF_LIBRARY}
-	glog::glog)
+	glog::glog
+	gflags)
 
 # Create kvstore_test executable
 add_executable(kvstore_test ${TST_HDRS} ${TST_SRCS})
