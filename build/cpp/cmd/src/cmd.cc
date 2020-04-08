@@ -92,6 +92,12 @@ void cmd::CommandLine::Warble(const std::string &username,
   Any any;
   request.set_username(username);
   request.set_text(text);
+  srand(time(NULL));
+  int rand_id = rand();
+  while (CheckWarble(rand_id)) {
+    rand_id = rand();
+  }
+  request.set_id(std::to_string(rand_id));
   if (parent_id != -1) {
     if (CheckWarble(parent_id)) {
       request.set_parent_id(std::to_string(parent_id));

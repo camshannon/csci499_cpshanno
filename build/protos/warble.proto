@@ -29,7 +29,8 @@ message RegisteruserReply {
 message WarbleRequest {
   string username = 1;
   string text = 2;  // The contents of the new warble to be posted.
-  bytes parent_id = 3;  // (optional) The ID of the warble this is in response to.
+  bytes id = 3;  // The ID of this warble.
+  bytes parent_id = 4;  // (optional) The ID of the warble this is in response to.
 }
 
 message WarbleReply {

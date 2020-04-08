@@ -21,7 +21,7 @@ using grpc::Status;
 
 namespace func_client {
 
-// the key value store client
+// the func client
 class FuncServiceClient {
 public:
   // func client constructor

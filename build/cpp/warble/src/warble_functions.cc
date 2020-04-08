@@ -1,31 +1,5 @@
 #include "warble_functions.h"
 
-const std::unordered_map<
-    std::string,
-    std::pair<std::function<
-                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
-              std::function<Any(std::vector<std::vector<std::string>>)>>>
-    warble_functions::WarbleFunctions::func_map_{
-        {"Registeruser", std::make_pair(RegisteruserRequestPackager,
-                                        RegisteruserReplyPackager)},
-        {"Warble", std::make_pair(WarbleRequestPackager, WarbleReplyPackager)},
-        {"Follow", std::make_pair(FollowRequestPackager, FollowReplyPackager)},
-        {"Read", std::make_pair(ReadRequestPackager, ReadReplyPackager)},
-        {"Profile",
-         std::make_pair(ProfileRequestPackager, ProfileReplyPackager)}};
-
-int warble_functions::warble_count_ = 0;
-
-const std::unordered_map<
-    std::string,
-    std::pair<std::function<
-                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
-              std::function<Any(std::vector<std::vector<std::string>>)>>> &
-warble_functions::GetFuncMap() {
-  LOG(INFO) << "func_map_ retrieval commenced";
-  return func_map_;
-}
-
 // receives a register user request as an any and packages it for func
 const std::vector<std::tuple<int, std::string, std::string>>
 warble_functions::RegisteruserRequestPackager(const Any &any) {
@@ -62,7 +36,7 @@ warble_functions::WarbleRequestPackager(const Any &any) {
   Warble warble;
   warble.set_username(*request.release_username());
   warble.set_text(*request.release_text());
-  warble.set_id(std::to_string(warble_count_));
+  warble.set_id(*request.release_id());
   if (request.parent_id() != "") {
     warble.set_parent_id(*request.release_parent_id());
   }
@@ -81,28 +55,18 @@ warble_functions::WarbleRequestPackager(const Any &any) {
   // if parent id is empty, it is a base warble
   // otherwise, add the warble to the parent id
   if (warble.parent_id() != "") {
-    if (std::stoi(warble.parent_id()) >= warble_count_) {
-      LOG(ERROR) << "WarbleRequest packaged with invalid parent_id";
-      // -1 indicates an error has occurred
-      const auto &warble_put = std::make_tuple(
-          -1, "warble_" + std::to_string(warble_count_), serialized_warble);
-      puts.push_back(warble_put);
-    } else {
-      LOG(INFO) << "WarbleRequest packaged with non-empty parent_id";
-      const auto &warble_put = std::make_tuple(
-          0, "warble_" + std::to_string(warble_count_), serialized_warble);
-      const auto &parent_put =
-          std::make_tuple(0, "warble_" + warble.parent_id(), serialized_warble);
-      puts.push_back(warble_put);
-      puts.push_back(parent_put);
-      warble_count_++;
-    }
+    LOG(INFO) << "WarbleRequest packaged with non-empty parent_id";
+    const auto &warble_put =
+        std::make_tuple(0, "warble_" + warble.id(), serialized_warble);
+    const auto &parent_put =
+        std::make_tuple(0, "warble_" + warble.parent_id(), serialized_warble);
+    puts.push_back(warble_put);
+    puts.push_back(parent_put);
   } else {
     LOG(INFO) << "WarbleRequest packaged with empty parent_id";
-    const auto &warble_put = std::make_tuple(
-        0, "warble_" + std::to_string(warble_count_), serialized_warble);
+    const auto &warble_put =
+        std::make_tuple(0, "warble_" + warble.id(), serialized_warble);
     puts.push_back(warble_put);
-    warble_count_++;
   }
   return puts;
 }

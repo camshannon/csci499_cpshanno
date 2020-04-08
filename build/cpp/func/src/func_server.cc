@@ -76,6 +76,6 @@ void func_server::RunServer(
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   LOG(INFO) << "func_server main commenced";
-  func_server::RunServer(warble_functions::WarbleFunctions::GetFuncMap());
+  func_server::RunServer(warble_functions::func_map);
   return 0;
 }
