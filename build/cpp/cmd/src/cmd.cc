@@ -192,7 +192,7 @@ void cmd::CommandLine::Profile(const std::string &username) {
   const auto &result = func_client_->event(4, any);
   result->UnpackTo(&reply);
   std::cout << "Followers: ";
-  for (int i = 0; i < reply.followers().size(); i++) {
+  for (int i = 1; i < reply.followers().size(); i++) {
     std::cout << reply.followers()[i];
     if (i < reply.followers().size() - 1) {
       std::cout << ", ";
@@ -200,7 +200,7 @@ void cmd::CommandLine::Profile(const std::string &username) {
   }
   std::cout << std::endl;
   std::cout << "Following: ";
-  for (int i = 0; i < reply.following().size(); i++) {
+  for (int i = 1; i < reply.following().size(); i++) {
     std::cout << reply.following()[i];
     if (i < reply.following().size() - 1) {
       std::cout << ", ";
