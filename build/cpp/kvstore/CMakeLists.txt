@@ -29,7 +29,8 @@ set(SRV_HDRS inc/kvstore_server.h
 	${CMAKE_BINARY_DIR}/gen/kvstore.grpc.pb.h)
 
 # Set sources for kvstore_server
-set(SRV_SRCS src/kvstore_server.cc
+set(SRV_SRCS main.cc
+	src/kvstore_server.cc
 	src/kvstore.cc
 	${CMAKE_BINARY_DIR}/gen/kvstore.pb.cc
 	${CMAKE_BINARY_DIR}/gen/kvstore.grpc.pb.cc)

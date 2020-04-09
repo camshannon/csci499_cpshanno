@@ -1,5 +1,14 @@
 #include "kvstore_server.h"
 
+// key value store server constructor
+kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(const String& file) {
+  kvstore_ = new kvstore::KVStore(file);
+}
+
+kvstore_server::keyValueStoreServiceImpl::~KeyValueStoreServiceImpl() {
+  delete kvstore_;
+}
+
 // puts a value in the key value store
 Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      const PutRequest *request,
@@ -43,10 +52,11 @@ Status kvstore_server::KeyValueStoreServiceImpl::remove(
 }
 
 // runs the server on port 50001
-void kvstore_server::RunServer() {
+void kvstore_server::RunServer(const String& store) {
   LOG(INFO) << "Run server commenced";
   std::string server_address("0.0.0.0:50001");
   KeyValueStoreServiceImpl service;
+  service.Read(store);
   ServerBuilder builder;
   LOG(INFO) << "Service declared";
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -54,11 +64,4 @@ void kvstore_server::RunServer() {
   std::unique_ptr<Server> server(builder.BuildAndStart());
   LOG(INFO) << "Server listening on " << server_address;
   server->Wait();
-}
-
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  LOG(INFO) << "kvstore_server main commenced";
-  kvstore_server::RunServer();
-  return 0;
 }

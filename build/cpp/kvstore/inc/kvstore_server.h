@@ -26,6 +26,12 @@ namespace kvstore_server {
 // the key value store server
 class KeyValueStoreServiceImpl final : public KeyValueStore::Service {
 public:
+  // key value store server constructor
+  KeyValueStoreServiceImpl(const String& file);
+
+  // key value store service destructor
+  ~KeyValueStoreServiceImpl();
+
   // puts a value into the key value store
   Status put(ServerContext *context, const PutRequest *request,
              PutReply *reply) override;
