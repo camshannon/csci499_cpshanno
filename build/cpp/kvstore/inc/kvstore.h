@@ -5,12 +5,24 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <fstream>
+
+#include <glog/logging.h>
 
 namespace kvstore {
 
 // the key value store
 class KVStore {
 public:
+  // key value store constructor
+  KVStore(const std::string& store);
+
+  // read key value store to file
+  void ReadFile();
+
+  // write key value store to file
+  void WriteFile();
+
   // puts a key value pair into kvstore_map_
   void Put(const std::string &key, const std::string &value);
 
@@ -26,5 +38,7 @@ private:
 
   // the mutex for obtaining locks on the unordered map
   mutable std::shared_mutex mutex_;
+
+  std::string store_;
 };
 } // namespace kvstore

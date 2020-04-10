@@ -1,12 +1,18 @@
 #include "kvstore_server.h"
 
 // key value store server constructor
-kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(const String& file) {
-  kvstore_ = new kvstore::KVStore(file);
+kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(const std::string& store) {
+  kvstore_ = new kvstore::KVStore(store);
 }
 
-kvstore_server::keyValueStoreServiceImpl::~KeyValueStoreServiceImpl() {
+// key value store destructor
+kvstore_server::KeyValueStoreServiceImpl::~KeyValueStoreServiceImpl() {
   delete kvstore_;
+}
+
+static void kvstore_server::KeyValueStoreServiceImpl::SignalHandler(int signum) {
+  kvstore_->WriteFile();
+  exit(signum);
 }
 
 // puts a value in the key value store
@@ -15,7 +21,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      PutReply *reply) {
   LOG(INFO) << "Put for key " << request->key() << " and value "
             << request->value() << " in key value store commenced";
-  kvstore_.Put(request->key(), request->value());
+  kvstore_->Put(request->key(), request->value());
   return Status::OK;
 }
 
@@ -27,7 +33,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
   GetReply reply;
   stream->Read(&request);
   LOG(INFO) << "Getting value for key " << request.key();
-  const auto &values = kvstore_.Get(request.key());
+  const auto &values = kvstore_->Get(request.key());
   if (values) {
     LOG(INFO) << "Key " << request.key()
               << " was found. Writing to stream commenced";
@@ -47,16 +53,15 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
 Status kvstore_server::KeyValueStoreServiceImpl::remove(
     ServerContext *context, const RemoveRequest *request, RemoveReply *reply) {
   LOG(INFO) << "Remove in key value store commenced";
-  kvstore_.Remove(request->key());
+  kvstore_->Remove(request->key());
   return Status::OK;
 }
 
 // runs the server on port 50001
-void kvstore_server::RunServer(const String& store) {
+void kvstore_server::RunServer(const std::string& store) {
   LOG(INFO) << "Run server commenced";
   std::string server_address("0.0.0.0:50001");
-  KeyValueStoreServiceImpl service;
-  service.Read(store);
+  KeyValueStoreServiceImpl service(store);
   ServerBuilder builder;
   LOG(INFO) << "Service declared";
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -64,4 +69,6 @@ void kvstore_server::RunServer(const String& store) {
   std::unique_ptr<Server> server(builder.BuildAndStart());
   LOG(INFO) << "Server listening on " << server_address;
   server->Wait();
+  signal(SIGINT, service.SignalHandler);
+  signal(SIGTERM, service.SignalHandler);
 }
