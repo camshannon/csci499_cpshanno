@@ -1,7 +1,7 @@
 #include "kvstore.h"
 
 // key value store constructor
-kvstore::KVStore::KVStore(const std::string& store) {
+kvstore::KVStore::KVStore(const std::string &store) {
   store_ = "data/" + store;
   ReadFile();
 }
@@ -9,28 +9,32 @@ kvstore::KVStore::KVStore(const std::string& store) {
 // read key value store
 void kvstore::KVStore::ReadFile() {
   std::ifstream input_file(store_, std::ifstream::in);
-  std::string read = "";
-  std::string key = "";
-  while(std::getline(input_file, read)) {
-    if(read.at(0) == 'k') {
-      key = read.substr(1);
+  KVMap kvmap;
+  kvmap.ParseFromIstream(&input_file);
+  for (const auto &kvpair : kvmap.kvpairs()) {
+    std::vector<std::string> v;
+    for (const auto &value : kvpair.values()) {
+      v.push_back(value);
     }
-    else {
-      this->Put(key, read.substr(1));
-    }
+    kvstore_map_[kvpair.key()] = v;
   }
 }
 
 // write key value store
 void kvstore::KVStore::WriteFile() {
+  KVMap kvmap;
+  std::vector<KVPair> v;
+  for (std::unordered_map<std::string, std::vector<std::string>>::iterator it =
+           kvstore_map_.begin();
+       it != kvstore_map_.end(); ++it) {
+    KVPair kvpair;
+    kvpair.set_key(it->first);
+    *kvpair.mutable_values() = {it->second.begin(), it->second.end()};
+    v.push_back(kvpair);
+  }
+  *kvmap.mutable_kvpairs() = {v.begin(), v.end()};
   std::ofstream output_file(store_, std::ofstream::out | std::ofstream::trunc);
-  std::unordered_map<std::string, std::vector<std::string>>::iterator it = kvstore_map_.begin();
-    for(std::unordered_map<std::string, std::vector<std::string>>::iterator it = kvstore_map_.begin(); it != kvstore_map_.end(); ++it) {
-      output_file << "k" << it->first << "\n";
-      for (const auto &value : it->second) {
-        output_file << "v" << value << "\n";
-      }
-    }
+  kvmap.SerializeToOstream(&output_file);
 }
 
 // puts a key value pair into the unordered map

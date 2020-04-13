@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iterator>
 #include <mutex>
 #include <optional>
@@ -5,9 +6,15 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <fstream>
 
 #include <glog/logging.h>
+#include <grpcpp/grpcpp.h>
+
+#include "kvstore.pb.h"
+
+using google::protobuf::Any;
+using kvstore::KVMap;
+using kvstore::KVPair;
 
 namespace kvstore {
 
@@ -15,7 +22,7 @@ namespace kvstore {
 class KVStore {
 public:
   // key value store constructor
-  KVStore(const std::string& store);
+  KVStore(const std::string &store);
 
   // read key value store to file
   void ReadFile();

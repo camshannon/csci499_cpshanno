@@ -1,18 +1,17 @@
 #include "kvstore_server.h"
 
 // key value store server constructor
-kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(const std::string& store) {
+kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(
+    const std::string &store) {
+  LOG(INFO) << "Server constructor commenced";
   kvstore_ = new kvstore::KVStore(store);
 }
 
 // key value store destructor
 kvstore_server::KeyValueStoreServiceImpl::~KeyValueStoreServiceImpl() {
-  delete kvstore_;
-}
-
-static void kvstore_server::KeyValueStoreServiceImpl::SignalHandler(int signum) {
+  LOG(INFO) << "Server destructor commenced";
   kvstore_->WriteFile();
-  exit(signum);
+  delete kvstore_;
 }
 
 // puts a value in the key value store
@@ -58,17 +57,14 @@ Status kvstore_server::KeyValueStoreServiceImpl::remove(
 }
 
 // runs the server on port 50001
-void kvstore_server::RunServer(const std::string& store) {
+void kvstore_server::RunServer(KeyValueStoreServiceImpl *service) {
   LOG(INFO) << "Run server commenced";
   std::string server_address("0.0.0.0:50001");
-  KeyValueStoreServiceImpl service(store);
   ServerBuilder builder;
   LOG(INFO) << "Service declared";
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  builder.RegisterService(&service);
+  builder.RegisterService(service);
   std::unique_ptr<Server> server(builder.BuildAndStart());
   LOG(INFO) << "Server listening on " << server_address;
   server->Wait();
-  signal(SIGINT, service.SignalHandler);
-  signal(SIGTERM, service.SignalHandler);
 }
