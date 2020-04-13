@@ -3,15 +3,19 @@
 // key value store server constructor
 kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(
     const std::string &store) {
-  LOG(INFO) << "Server constructor commenced";
-  kvstore_ = new kvstore::KVStore(store);
+  store_ = store;
+  if (store_ != "") {
+    LOG(INFO) << "Reading from store: " << store_;
+  }
+  kvstore_.ReadFile(store_);
 }
 
 // key value store destructor
 kvstore_server::KeyValueStoreServiceImpl::~KeyValueStoreServiceImpl() {
-  LOG(INFO) << "Server destructor commenced";
-  kvstore_->WriteFile();
-  delete kvstore_;
+  if (store_ != "") {
+    LOG(INFO) << "Writing to store: " << store_;
+  }
+  kvstore_.WriteFile(store_);
 }
 
 // puts a value in the key value store
@@ -20,7 +24,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::put(ServerContext *context,
                                                      PutReply *reply) {
   LOG(INFO) << "Put for key " << request->key() << " and value "
             << request->value() << " in key value store commenced";
-  kvstore_->Put(request->key(), request->value());
+  kvstore_.Put(request->key(), request->value());
   return Status::OK;
 }
 
@@ -32,7 +36,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
   GetReply reply;
   stream->Read(&request);
   LOG(INFO) << "Getting value for key " << request.key();
-  const auto &values = kvstore_->Get(request.key());
+  const auto &values = kvstore_.Get(request.key());
   if (values) {
     LOG(INFO) << "Key " << request.key()
               << " was found. Writing to stream commenced";
@@ -52,7 +56,7 @@ Status kvstore_server::KeyValueStoreServiceImpl::get(
 Status kvstore_server::KeyValueStoreServiceImpl::remove(
     ServerContext *context, const RemoveRequest *request, RemoveReply *reply) {
   LOG(INFO) << "Remove in key value store commenced";
-  kvstore_->Remove(request->key());
+  kvstore_.Remove(request->key());
   return Status::OK;
 }
 

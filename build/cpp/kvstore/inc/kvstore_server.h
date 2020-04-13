@@ -52,7 +52,10 @@ public:
 
 private:
   // the key value store for the server
-  kvstore::KVStore *kvstore_;
+  kvstore::KVStore kvstore_;
+
+  // the file for storing the server
+  std::string store_;
 };
 
 // runs the server on port 50000
