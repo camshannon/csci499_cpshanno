@@ -92,6 +92,12 @@ void cmd::CommandLine::Warble(const std::string &username,
   Any any;
   request.set_username(username);
   request.set_text(text);
+  srand(time(NULL));
+  int rand_id = rand();
+  while (CheckWarble(rand_id)) {
+    rand_id = rand();
+  }
+  request.set_id(std::to_string(rand_id));
   if (parent_id != -1) {
     if (CheckWarble(parent_id)) {
       request.set_parent_id(std::to_string(parent_id));
@@ -186,7 +192,7 @@ void cmd::CommandLine::Profile(const std::string &username) {
   const auto &result = func_client_->event(4, any);
   result->UnpackTo(&reply);
   std::cout << "Followers: ";
-  for (int i = 0; i < reply.followers().size(); i++) {
+  for (int i = 1; i < reply.followers().size(); i++) {
     std::cout << reply.followers()[i];
     if (i < reply.followers().size() - 1) {
       std::cout << ", ";
@@ -194,7 +200,7 @@ void cmd::CommandLine::Profile(const std::string &username) {
   }
   std::cout << std::endl;
   std::cout << "Following: ";
-  for (int i = 0; i < reply.following().size(); i++) {
+  for (int i = 1; i < reply.following().size(); i++) {
     std::cout << reply.following()[i];
     if (i < reply.following().size() - 1) {
       std::cout << ", ";

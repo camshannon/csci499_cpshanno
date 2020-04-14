@@ -24,122 +24,124 @@ using warble::Warble;
 using warble::WarbleReply;
 using warble::WarbleRequest;
 
+// request vector type for func calls
+//  the vector size is the number of calls being made to func
+//  the int indicates the request type
+//   0 for puts, 1 for gets, 2 for removes, and -1 for an error
+//  the first string indicates the key
+//  the second string is the value for puts or empty string
+using request_vector = std::vector<std::tuple<int, std::string, std::string>>;
+
+// result vector type for returning values
+//  the outer vector indicates seperate values being returned
+//  the inner vector indicates values of the same key being returned
+using reply_vector = std::vector<std::vector<std::string>>;
+
+// map type for function names to request/reply pairs
+using function_mapping = std::unordered_map<
+    std::string,
+    std::pair<std::function<
+                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
+              std::function<Any(std::vector<std::vector<std::string>>)>>>;
+
 namespace warble_functions {
 
-// the key value store
-class WarbleFunctions {
-public:
-  // gets the func_map
-  // @return the func_map from string to pairs of request and reply functions
-  static const std::unordered_map<
-      std::string,
-      std::pair<std::function<std::vector<
-                    std::tuple<int, std::string, std::string>>(Any)>,
-                std::function<Any(std::vector<std::vector<std::string>>)>>> &
-  GetFuncMap();
+// receives a register user request as an any and packages it for func
+//  @param: RegisterUserRequest any
+//  @return: request vector
+//   size: 2
+//   int: 0 indicating put
+//   string1: username_following and username_followers
+//   string2: empty string
+const request_vector
+RegisteruserRequestPackager(const Any &any);
 
-  // receives a register user request as an any and packages it for func
-  // @param: the any containing the register user request
-  // @return: the vector allowing for multiple calls to func
-  //  vector will have size 3
-  //  the int 0 indicates a put request to func
-  //  the first string indicates the user's username, username_following, and
-  //  username_followers the second string indicates the user's username
-  static const std::vector<std::tuple<int, std::string, std::string>>
-  RegisteruserRequestPackager(const Any &any);
+// receives a placeholder 2D vector and returns the register user reply
+// @param: reply vector
+//   empty as success is indicated by gRPC status
+// @return: RegisterUserReply any
+const Any
+RegisteruserReplyPackager(const reply_vector &result);
 
-  // receives a placeholder 2D vector and returns the register user reply
-  // @param: the vector allowing for multiple values to be returned
-  //  the 2D vector will be a placeholder as the register user reply is
-  //  indicated by the GRPC status
-  // @return: the empty register user reply
-  static const Any RegisteruserReplyPackager(
-      const std::vector<std::vector<std::string>> &result);
+// receives a warble request as an any and packages it for func
+// @param:  WarbleRequest any
+// @return: request vector
+//   size: 1 or 2 depending on if the warble has a parent
+//   int: 1 indicating get
+//   string1: the id of the warble and parent id of the warble respectively
+//   string2: the serialized warble
+const request_vector
+WarbleRequestPackager(const Any &any);
 
-  // receives a warble request as an any and packages it for func
-  // @param: the any containing the warble request
-  // @return: the vector allows for multiple calls to func
-  //  vector will have size 1 or 2 depending on if the warble has a parent
-  //  the int value 1 indicates a put request to func
-  //  the first string indicates the id of the warble and the parent id of the
-  //  warble the second string indicates the serialized warble
-  static const std::vector<std::tuple<int, std::string, std::string>>
-  WarbleRequestPackager(const Any &any);
+// receives a warble and packages it in a warble reply for the frontend
+// @param: reply vector
+//   holds 1 element, the desired warble output
+// @return: the warble reply any containing the accessed warble
+const Any
+WarbleReplyPackager(const reply_vector &result);
 
-  // receives a warble and packages it in a warble reply for the frontend
-  // @param: the vector allowing for multiple values to be returned
-  //  the 2D vector will hold 1 element, the desired warble output
-  // @return the warble reply containing the accessed warble
-  static const Any
-  WarbleReplyPackager(const std::vector<std::vector<std::string>> &result);
+// receives a follow request as an any and packages it for func
+// @param: FollowRequest any
+// @return: request vector
+//    size: 2
+//    int: 0 indicating put
+//    string1: username_following and to_follow_following
+//    string2: to_follow and username respectively
+const request_vector
+FollowRequestPackager(const Any &any);
 
-  // receives a follow request as an any and packages it for func
-  // @return: A vector allowing for multiple calls to func
-  //  vector will have size 2
-  //  the int value 0 indicates a put request to func
-  //  the first string indicates the username_following and to_follow_following
-  //  the second string indicates the to_follow for username and username for
-  //  to_follow
-  static const std::vector<std::tuple<int, std::string, std::string>>
-  FollowRequestPackager(const Any &any);
+// receives a placeholder 2D vector and returns the follow reply
+// @param: reply vector
+//   empty as success is indicated by gRPC status
+// @return: FollowReply any
+const Any
+FollowReplyPackager(const reply_vector &result);
 
-  // receives a placeholder 2D vector and returns the follow reply
-  // @param: the vector allowing for multiple values to be returned
-  //  the 2D vector will be a placeholder as the register user reply is
-  //  indicated by the GRPC status
-  // @return: the empty follow reply
-  static const Any
-  FollowReplyPackager(const std::vector<std::vector<std::string>> &result);
+// receives a read request as an any and packages it for func
+// @param: ReadRequest any
+// @return: request vector
+//   size: 1
+//   int: 1 indicating get
+//   string1: warble_warble_id
+//   string2: empty string
+const request_vector
+ReadRequestPackager(const Any &any);
 
-  // receives a follow request as an any and packages it for func
-  // @return: A vector allowing for multiple calls to func
-  //  vector will have size 2
-  //  the int value 1 indicates a get request to func
-  //  the first string indicates the username_following and to_follow_following
-  //  the second string indicates the to_follow for username and username for
-  //  to_follow
-  static const std::vector<std::tuple<int, std::string, std::string>>
-  ReadRequestPackager(const Any &any);
+// receives a vector containing all the warbles in reply to the requested
+// warble and packages it in a read reply for the frontend
+// @param: reply vector
+//   holds the vector of warbles in reply to the requested warble
+// @return: ReadReply any
+const Any
+ReadReplyPackager(const reply_vector &result);
 
-  // receives a vector containing all the warbles in reply to the requested
-  // warble
-  // @param: the vector allowing for multiple values to be returned
-  //  the 2D vector will be a placeholder as the register user reply is
-  //  indicated by the GRPC status
-  // @return: the empty follow reply
-  static const Any
-  ReadReplyPackager(const std::vector<std::vector<std::string>> &result);
+// receives a profile request as an any and packages it for func
+// @param: ProfileRequest any
+// @return: request vector
+//   size: 2
+//   int1: 1 indicating get
+//   string1: username, username_following
+//   string2: empty string
+const request_vector
+ProfileRequestPackager(const Any &any);
 
-  // receives a profile request as an any and packages it for func
-  // @return: A vector allowing for multiple calls to func
-  //  vector will have size 3
-  //  the int value 1 indicates a get request to func
-  //  the first string indicates the username, username_following,
-  //  username_followers the second string is a placeholder and will be empty
-  static const std::vector<std::tuple<int, std::string, std::string>>
-  ProfileRequestPackager(const Any &any);
+// receives a vector containing the two vectors of the user's followers and
+// followings
+// @param: reply vector
+//   holds two vectors containing the username_followers and username_followings
+// @return: ProfileReply any
+const Any
+ProfileReplyPackager(const reply_vector &result);
 
-  // receives a vector containing the two vectors of the user's followers and
-  // followings
-  // @param: the vector allowing for multiple values to be returned
-  //  the 2D vector will have three vectors containing the username,
-  //  username_followers, and username_followings
-  // @return: the profile reply containing the two vectors of the user's
-  // followers and followings
-  //  empty if username is not found
-  static const Any
-  ProfileReplyPackager(const std::vector<std::vector<std::string>> &result);
-
-private:
-  // the unordered map for associating function names with functions
-  //  function names map to request function and reply function
-  static const std::unordered_map<
-      std::string,
-      std::pair<std::function<std::vector<
-                    std::tuple<int, std::string, std::string>>(Any)>,
-                std::function<Any(std::vector<std::vector<std::string>>)>>>
-      func_map_;
-  // a counter for the warble id
-  static int warble_count_;
-};
+// the unordered map for associating function names with functions
+//  function names map to request function and reply function
+const function_mapping
+    func_map{
+        {"Registeruser", std::make_pair(RegisteruserRequestPackager,
+                                        RegisteruserReplyPackager)},
+        {"Warble", std::make_pair(WarbleRequestPackager, WarbleReplyPackager)},
+        {"Follow", std::make_pair(FollowRequestPackager, FollowReplyPackager)},
+        {"Read", std::make_pair(ReadRequestPackager, ReadReplyPackager)},
+        {"Profile",
+         std::make_pair(ProfileRequestPackager, ProfileReplyPackager)}};
 } // namespace warble_functions

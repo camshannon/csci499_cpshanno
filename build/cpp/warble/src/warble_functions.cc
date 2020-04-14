@@ -1,49 +1,23 @@
 #include "warble_functions.h"
 
-const std::unordered_map<
-    std::string,
-    std::pair<std::function<
-                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
-              std::function<Any(std::vector<std::vector<std::string>>)>>>
-    warble_functions::WarbleFunctions::func_map_{
-        {"Registeruser", std::make_pair(RegisteruserRequestPackager,
-                                        RegisteruserReplyPackager)},
-        {"Warble", std::make_pair(WarbleRequestPackager, WarbleReplyPackager)},
-        {"Follow", std::make_pair(FollowRequestPackager, FollowReplyPackager)},
-        {"Read", std::make_pair(ReadRequestPackager, ReadReplyPackager)},
-        {"Profile",
-         std::make_pair(ProfileRequestPackager, ProfileReplyPackager)}};
-
-int warble_functions::WarbleFunctions::warble_count_ = 0;
-
-const std::unordered_map<
-    std::string,
-    std::pair<std::function<
-                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
-              std::function<Any(std::vector<std::vector<std::string>>)>>> &
-warble_functions::WarbleFunctions::GetFuncMap() {
-  LOG(INFO) << "func_map_ retrieval commenced";
-  return func_map_;
-}
-
 // receives a register user request as an any and packages it for func
-const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::RegisteruserRequestPackager(const Any &any) {
+const request_vector
+warble_functions::RegisteruserRequestPackager(const Any &any) {
   LOG(INFO) << "RegisteruserRequest packaging commenced";
   RegisteruserRequest request;
   any.UnpackTo(&request);
   const auto &following_put =
-      std::make_tuple(0, request.username() + "_following", request.username());
+      std::make_tuple(0, request.username() + "_following", "");
   const auto &followers_put =
-      std::make_tuple(0, request.username() + "_followers", request.username());
-  std::vector<std::tuple<int, std::string, std::string>> puts{following_put,
+      std::make_tuple(0, request.username() + "_followers", "");
+  request_vector puts{following_put,
                                                               followers_put};
   return puts;
 }
 
 // receives a placeholder 2D vector and returns the register user reply
-const Any warble_functions::WarbleFunctions::RegisteruserReplyPackager(
-    const std::vector<std::vector<std::string>> &result) {
+const Any warble_functions::RegisteruserReplyPackager(
+    const reply_vector &result) {
   LOG(INFO) << "RegisteruserReply packaging commenced";
   RegisteruserReply reply;
   Any any;
@@ -53,8 +27,8 @@ const Any warble_functions::WarbleFunctions::RegisteruserReplyPackager(
 
 // processes a warble request, assigns an id and timestamp, and
 // returns the id, and serialized warble message
-const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::WarbleRequestPackager(const Any &any) {
+const request_vector
+warble_functions::WarbleRequestPackager(const Any &any) {
   LOG(INFO) << "WarbleRequest packaging commenced";
   WarbleRequest request;
   // the below line is causing me memory leaks when testing with valgrind
@@ -62,7 +36,7 @@ warble_functions::WarbleFunctions::WarbleRequestPackager(const Any &any) {
   Warble warble;
   warble.set_username(*request.release_username());
   warble.set_text(*request.release_text());
-  warble.set_id(std::to_string(warble_count_));
+  warble.set_id(*request.release_id());
   if (request.parent_id() != "") {
     warble.set_parent_id(*request.release_parent_id());
   }
@@ -81,35 +55,25 @@ warble_functions::WarbleFunctions::WarbleRequestPackager(const Any &any) {
   // if parent id is empty, it is a base warble
   // otherwise, add the warble to the parent id
   if (warble.parent_id() != "") {
-    if (std::stoi(warble.parent_id()) >= warble_count_) {
-      LOG(ERROR) << "WarbleRequest packaged with invalid parent_id";
-      // -1 indicates an error has occurred
-      const auto &warble_put = std::make_tuple(
-          -1, "warble_" + std::to_string(warble_count_), serialized_warble);
-      puts.push_back(warble_put);
-    } else {
-      LOG(INFO) << "WarbleRequest packaged with non-empty parent_id";
-      const auto &warble_put = std::make_tuple(
-          0, "warble_" + std::to_string(warble_count_), serialized_warble);
-      const auto &parent_put =
-          std::make_tuple(0, "warble_" + warble.parent_id(), serialized_warble);
-      puts.push_back(warble_put);
-      puts.push_back(parent_put);
-      warble_count_++;
-    }
+    LOG(INFO) << "WarbleRequest packaged with non-empty parent_id";
+    const auto &warble_put =
+        std::make_tuple(0, "warble_" + warble.id(), serialized_warble);
+    const auto &parent_put =
+        std::make_tuple(0, "warble_" + warble.parent_id(), serialized_warble);
+    puts.push_back(warble_put);
+    puts.push_back(parent_put);
   } else {
     LOG(INFO) << "WarbleRequest packaged with empty parent_id";
-    const auto &warble_put = std::make_tuple(
-        0, "warble_" + std::to_string(warble_count_), serialized_warble);
+    const auto &warble_put =
+        std::make_tuple(0, "warble_" + warble.id(), serialized_warble);
     puts.push_back(warble_put);
-    warble_count_++;
   }
   return puts;
 }
 
 // receives a warble and packages it in a warble reply for the frontend
-const Any warble_functions::WarbleFunctions::WarbleReplyPackager(
-    const std::vector<std::vector<std::string>> &result) {
+const Any warble_functions::WarbleReplyPackager(
+    const reply_vector &result) {
   LOG(INFO) << "WarbleReply packaging commenced";
   Warble warble;
   warble.ParseFromString(result[0][0]);
@@ -121,8 +85,8 @@ const Any warble_functions::WarbleFunctions::WarbleReplyPackager(
 }
 
 // receives a follow request as an any and packages it for func
-const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::FollowRequestPackager(const Any &any) {
+const request_vector
+warble_functions::FollowRequestPackager(const Any &any) {
   LOG(INFO) << "FollowRequest packaging commenced";
   FollowRequest request;
   any.UnpackTo(&request);
@@ -130,14 +94,14 @@ warble_functions::WarbleFunctions::FollowRequestPackager(const Any &any) {
       0, request.username() + "_following", request.to_follow());
   std::tuple<int, std::string, std::string> to_follow_put = std::make_tuple(
       0, request.to_follow() + "_followers", request.username());
-  std::vector<std::tuple<int, std::string, std::string>> puts{username_put,
+  request_vector puts{username_put,
                                                               to_follow_put};
   return puts;
 }
 
 // receives a placeholder 2D vector and returns the follow reply
-const Any warble_functions::WarbleFunctions::FollowReplyPackager(
-    const std::vector<std::vector<std::string>> &result) {
+const Any warble_functions::FollowReplyPackager(
+    const reply_vector &result) {
   LOG(INFO) << "FollowReply packaging commenced";
   FollowReply reply;
   Any any;
@@ -146,20 +110,20 @@ const Any warble_functions::WarbleFunctions::FollowReplyPackager(
 }
 
 // receives a follow request as an any and packages it for func
-const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::ReadRequestPackager(const Any &any) {
+const request_vector
+warble_functions::ReadRequestPackager(const Any &any) {
   LOG(INFO) << "ReadRequest packaging commenced";
   ReadRequest request;
   any.UnpackTo(&request);
   std::tuple<int, std::string, std::string> id_get =
       std::make_tuple(1, "warble_" + request.warble_id(), "");
-  std::vector<std::tuple<int, std::string, std::string>> gets{id_get};
+  request_vector gets{id_get};
   return gets;
 }
 
 // receives a vector containing all the warbles in reply to the requested warble
-const Any warble_functions::WarbleFunctions::ReadReplyPackager(
-    const std::vector<std::vector<std::string>> &result) {
+const Any warble_functions::ReadReplyPackager(
+    const reply_vector &result) {
   LOG(INFO) << "ReadReply packaging commenced";
   ReadReply reply;
   std::vector<Warble> parsed_warbles;
@@ -175,8 +139,8 @@ const Any warble_functions::WarbleFunctions::ReadReplyPackager(
 }
 
 // receives a profile request as an any and packages it for func
-const std::vector<std::tuple<int, std::string, std::string>>
-warble_functions::WarbleFunctions::ProfileRequestPackager(const Any &any) {
+const request_vector
+warble_functions::ProfileRequestPackager(const Any &any) {
   LOG(INFO) << "ProfileRequest packaging commenced";
   ProfileRequest request;
   any.UnpackTo(&request);
@@ -184,15 +148,15 @@ warble_functions::WarbleFunctions::ProfileRequestPackager(const Any &any) {
       std::make_tuple(1, request.username() + "_following", "");
   std::tuple<int, std::string, std::string> followers_get =
       std::make_tuple(1, request.username() + "_followers", "");
-  std::vector<std::tuple<int, std::string, std::string>> gets{following_get,
+  request_vector gets{following_get,
                                                               followers_get};
   return gets;
 }
 
 // receives a vector containing the two vectors of the user's followers and
 // followings
-const Any warble_functions::WarbleFunctions::ProfileReplyPackager(
-    const std::vector<std::vector<std::string>> &result) {
+const Any warble_functions::ProfileReplyPackager(
+    const reply_vector &result) {
   LOG(INFO) << "ProfileReply packaging commenced";
   ProfileReply reply;
   if (result[0].size() > 0 && result[1].size() > 0) {

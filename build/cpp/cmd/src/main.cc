@@ -37,7 +37,9 @@ int main(int argc, char **argv) {
       }
       if (FLAGS_profile) {
         command_line.Profile(FLAGS_user);
-      } else {
+      }
+      if (FLAGS_warble == "" && FLAGS_follow == "" && FLAGS_read == -1 &&
+          !FLAGS_profile) {
         std::cout << "User flag must be used with other flags." << std::endl;
       }
     } else {
