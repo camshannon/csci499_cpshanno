@@ -3,19 +3,19 @@
 // key value store server constructor
 kvstore_server::KeyValueStoreServiceImpl::KeyValueStoreServiceImpl(
     const std::string &store) {
-  store_ = store;
-  if (store_ != "") {
+  if (!store.empty()) {
+    store_ = store;
     LOG(INFO) << "Reading from store: " << store_;
+    kvstore_.ReadFile(store_);
   }
-  kvstore_.ReadFile(store_);
 }
 
 // key value store destructor
 kvstore_server::KeyValueStoreServiceImpl::~KeyValueStoreServiceImpl() {
-  if (store_ != "") {
+  if (!store_.empty()) {
     LOG(INFO) << "Writing to store: " << store_;
+    kvstore_.WriteFile(store_);
   }
-  kvstore_.WriteFile(store_);
 }
 
 // puts a value in the key value store
