@@ -61,7 +61,7 @@ set(TST_SRCS src/func_test.cc
 	${CMAKE_BINARY_DIR}/gen/kvstore.grpc.pb.cc)
 
 # Set executable path to bin folder
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/cpp/func/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 # Create func_server executable
 add_executable(func_server ${SRV_HDRS} ${SRV_SRCS})

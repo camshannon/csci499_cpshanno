@@ -50,7 +50,7 @@ set(WRBL_SRCS src/main.cc
 	${CMAKE_BINARY_DIR}/gen/warble.pb.cc)
 
 # Set executable path to bin folder
-set(EXECUTABLE_OUTPUT_PATH bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 # Create warble executable
 add_executable(warble ${WRBL_HDRS} ${WRBL_SRCS})

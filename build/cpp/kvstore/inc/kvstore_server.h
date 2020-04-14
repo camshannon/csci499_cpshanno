@@ -1,6 +1,9 @@
+#include <csignal>
 #include <memory>
 #include <string>
+#include <thread>
 
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
 
@@ -26,6 +29,15 @@ namespace kvstore_server {
 // the key value store server
 class KeyValueStoreServiceImpl final : public KeyValueStore::Service {
 public:
+  // key value store server constructor
+  KeyValueStoreServiceImpl(const std::string &store);
+
+  // key value store service destructor
+  ~KeyValueStoreServiceImpl();
+
+  // handles interrupt and termination signals
+  void WriteFile();
+
   // puts a value into the key value store
   Status put(ServerContext *context, const PutRequest *request,
              PutReply *reply) override;
@@ -41,8 +53,11 @@ public:
 private:
   // the key value store for the server
   kvstore::KVStore kvstore_;
+
+  // the file for storing the server
+  std::string store_;
 };
 
 // runs the server on port 50000
-void RunServer();
+void RunServer(KeyValueStoreServiceImpl *service);
 } // namespace kvstore_server
