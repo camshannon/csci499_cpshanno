@@ -30,7 +30,7 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
                                            const Any &payload) {
   std::shared_lock lock(mutex_);
   const auto &storage_requests = (event_map_[event_type].first)(payload);
-  std::vector<std::vector<std::string>> result;
+  reply_vector result;
   for (const auto &storage_request : storage_requests) {
     const auto &request_type = std::get<0>(storage_request);
     const auto &key = std::get<1>(storage_request);
@@ -67,22 +67,14 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
 
 // sets the pre-known map from function names to functions
 void func::Func::SetFuncMap(
-    const std::unordered_map<
-        std::string,
-        std::pair<std::function<std::vector<
-                      std::tuple<int, std::string, std::string>>(Any)>,
-                  std::function<Any(std::vector<std::vector<std::string>>)>>>
+    const function_mapping
         &func_map) {
   func_map_ = func_map;
 }
 
 // gets the event map
 //  for testing purposes
-std::unordered_map<
-    int32_t,
-    std::pair<std::function<
-                  std::vector<std::tuple<int, std::string, std::string>>(Any)>,
-              std::function<Any(std::vector<std::vector<std::string>>)>>>
+event_mapping
 func::Func::GetEventMap() {
   return event_map_;
 }
