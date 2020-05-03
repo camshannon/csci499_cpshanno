@@ -51,3 +51,7 @@ project/cpp/kvstore/kvstore_test
 
 #ignore .txt
 *.txt
+
+# vagrant files
+Vagrantfile
+.vagrant
