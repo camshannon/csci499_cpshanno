@@ -1,14 +1,12 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.13.0)
 
-# Project
 project(build)
 
 # C++ Standard
 add_compile_options(-std=c++17)
 
-# Set gRPC CMake module
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+# add glog installation directory
+list(APPEND CMAKE_PREFIX_PATH /usr/include/glog)
 
 # Add cpp subdirectory for building
 add_subdirectory(cpp)

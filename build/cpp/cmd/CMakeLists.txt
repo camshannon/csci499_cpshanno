@@ -1,7 +1,5 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.13.0)
 
-# Project
 project(cmd-component)
 
 # Find glog
@@ -14,10 +12,10 @@ find_package(GTest REQUIRED)
 find_package(gflags REQUIRED)
 
 # Find Protobuf
-find_package(Protobuf REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
 
 # Find gRPC
-find_package(GRPC REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 # Include header directories
 include_directories(
@@ -54,7 +52,8 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 # Create warble executable
 add_executable(warble ${WRBL_HDRS} ${WRBL_SRCS})
-target_link_libraries(warble PUBLIC gRPC::grpc++
+target_link_libraries(warble PUBLIC 
 	gflags
-	glog::glog
-	${PROTOBUF_LIBRARY})
+  glog::glog
+  ${PROTOBUF_LIBRARY}
+  gRPC::grpc++)

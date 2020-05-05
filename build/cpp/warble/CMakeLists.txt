@@ -1,7 +1,5 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.13.0)
 
-# Project
 project(warble-component)
 
 # Find glog
@@ -11,7 +9,7 @@ find_package(glog REQUIRED)
 find_package(GTest REQUIRED)
 
 # Find Protobuf
-find_package(Protobuf REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
 
 # Include header directory
 include_directories(inc)
