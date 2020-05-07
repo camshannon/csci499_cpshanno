@@ -35,6 +35,7 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
     const auto &request_type = std::get<0>(storage_request);
     const auto &key = std::get<1>(storage_request);
     const auto &value = std::get<2>(storage_request);
+    std::cout << request_type << " :: " << key << std::endl;
     std::vector<std::string> values;
     // put request
     if (request_type == 0) {
@@ -56,11 +57,36 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
       kvstore_client_->remove(key);
       values.push_back(value);
     }
+    
+    // stream notification
+    else if (request_type == 3) {
+      // get clients subscribed to this stream type
+      std::cout << "got a stream request_type" << std::endl;
+      const auto &optional_values = kvstore_client_->get("stream_"+key+"_");
+      if (optional_values) {
+        std::cout << "found keys of proper type\n";
+        std::vector<std::pair<std::string, Any>> clients;
+        for (std::string id : *optional_values) {
+          std::cout << "client id " << id << std::endl;
+          const auto &op_args = kvstore_client_->get("stream_args_"+id+"_");
+          if (op_args && op_args->size()) {
+            Any args;
+            args.ParseFromString(op_args->at(0));
+            // add the clients and their arguments to the list
+            clients.push_back(std::make_pair(id, args));
+          }
+        }
+        // call the stream handler and pass it clients
+        auto selected = stream_map_[key](clients, value);
+        // put the warble for the selected clients
+        for (auto id : selected) SetStreamSignal(id, value);
+      }
+   }
     // error request
     else if (request_type == -1) {
       return {};
     }
-    result.push_back(values);
+    if (request_type != 3) result.push_back(values);
   }
   return {(event_map_[event_type].second)(result)};
 }
@@ -72,9 +98,45 @@ void func::Func::SetFuncMap(
   func_map_ = func_map;
 }
 
+void func::Func::SetStreamMap(const stream_mapping &stream_map) {
+  stream_map_ = stream_map;
+}
+
 // gets the event map
 //  for testing purposes
 event_mapping
 func::Func::GetEventMap() {
   return event_map_;
+}
+
+// subscribes a client to a stream internally within func
+void func::Func::AddStreamClient(const std::string &client_id, const std::string &stream_type, const Any &args) {
+  kvstore_client_->put("stream_"+stream_type+"_", client_id);
+  kvstore_client_->put("stream_args_"+client_id+"_", args.SerializeAsString());
+}
+
+// mutator method for the stream signal
+void func::Func::SetStreamSignal(const std::string &client_id, const std::string &msg) {
+  kvstore_client_->put("stream_"+client_id+"_", msg);
+}
+
+// clears the stream signal for a client
+void func::Func::ClearStreamSignal(const std::string &client_id) {
+  kvstore_client_->remove("stream_"+client_id+"_");
+}
+
+// returns a message that the server needs to send to the given client over a stream
+// or nothing, if there isn't anything to send
+const std::optional<Any> func::Func::StreamSignal(const std::string &client_id) {
+  auto values = kvstore_client_->get("stream_"+client_id+"_");
+  if (values && values->size()) {
+    Any payload;
+    if (payload.ParseFromString(values->at(0))) {
+      return payload;
+    } else {
+      return std::nullopt;
+    }
+  } else {
+    return std::nullopt;
+  }
 }

@@ -31,12 +31,39 @@ Status func_server::FuncServiceImpl::event(ServerContext *context,
   if (optional_any) {
     *reply->mutable_payload() = *optional_any;
   } else {
-    LOG(ERROR) << "Event " << request->event_type()
-               << " failed to retrieve output.";
+    std::cout << "Event " << request->event_type()
+               << " failed to retrieve output.\n";
     return Status(StatusCode::INVALID_ARGUMENT,
                   "Event " + std::to_string(request->event_type()) +
                       " failed to retrieve output.");
   }
+  return Status::OK;
+}
+
+// represents an event request that reads from a stream
+Status func_server::FuncServiceImpl::stream(ServerContext *context, const StreamRequest *request, ServerWriter<EventReply> *writer) {
+  LOG(INFO) << "Stream commenced in func_server";
+  LOG(INFO) << "Auth context stuff";
+  for (auto sref : context->auth_context()->GetPeerIdentity()) {
+    LOG(INFO) << "found property :: " << sref.data();
+  }
+  context->AddInitialMetadata("connected", "yes");
+  writer->SendInitialMetadata();
+  auto id = std::to_string(reinterpret_cast<uint64_t>(context));
+  func_.AddStreamClient(id, request->stream_type(), request->payload());
+  // poll for updates
+  while (1) {
+    auto message = func_.StreamSignal(id);
+    if (message) {
+      EventReply reply;
+      *(reply.mutable_payload()) = *message;
+      // relay message to client
+      writer->Write(reply);
+      // clear signal
+      func_.ClearStreamSignal(id);
+    }
+  }
+  // should never reach here, but required for compilation
   return Status::OK;
 }
 
@@ -52,6 +79,10 @@ void func_server::FuncServiceImpl::SetFuncMap(
   func_.SetFuncMap(func_map);
 }
 
+void func_server::FuncServiceImpl::SetStreamMap(const stream_mapping &stream_map) {
+  func_.SetStreamMap(stream_map);
+}
+
 // runs the server on port 50000
 void func_server::RunServer(
     const std::unordered_map<
@@ -59,11 +90,12 @@ void func_server::RunServer(
         std::pair<std::function<std::vector<
                       std::tuple<int, std::string, std::string>>(Any)>,
                   std::function<Any(std::vector<std::vector<std::string>>)>>>
-        &func_map) {
+        &func_map, const stream_mapping &stream_map) {
   LOG(INFO) << "Run server commenced";
   std::string server_address("0.0.0.0:50000");
   FuncServiceImpl service;
   service.SetFuncMap(func_map);
+  service.SetStreamMap(stream_map);
   ServerBuilder builder;
   LOG(INFO) << "Service declared";
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
@@ -76,6 +108,6 @@ void func_server::RunServer(
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   LOG(INFO) << "func_server main commenced";
-  func_server::RunServer(warble_functions::func_map);
+  func_server::RunServer(warble_functions::func_map, warble_functions::stream_map);
   return 0;
 }

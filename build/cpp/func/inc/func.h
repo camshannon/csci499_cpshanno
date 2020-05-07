@@ -17,6 +17,7 @@
 #include "kvstore_client.h"
 
 using google::protobuf::Any;
+using grpc::ServerWriter;
 
 // reply vector type for value return
 using reply_vector = std::vector<std::vector<std::string>>;
@@ -35,47 +36,68 @@ using event_mapping = std::unordered_map<
                   std::vector<std::tuple<int, std::string, std::string>>(Any)>,
               std::function<Any(std::vector<std::vector<std::string>>)>>>;
 
-namespace func {
+//map type for stream handler functions
+using stream_mapping = std::unordered_map<std::string, std::function<std::vector<std::string>(std::vector<std::pair<std::string, Any>>, std::string)>>;
 
-// the func fucntions for hooking, unhook, and executing events
-class Func {
-public:
-  // func constructor
-  Func();
+namespace func
+{
 
-  // func destructor
-  ~Func();
+  // the func fucntions for hooking, unhook, and executing events
+  class Func
+  {
+  public:
+    // func constructor
+    Func();
 
-  // puts a new element into func_map_ or updates the value at event_type
-  void Hook(const int32_t &event_type, const std::string &event_function);
+    // func destructor
+    ~Func();
 
-  // removes the element with event_type if registered
-  void Unhook(const int32_t &event_type);
+    // puts a new element into func_map_ or updates the value at event_type
+    void Hook(const int32_t &event_type, const std::string &event_function);
 
-  // executes the function with the specified event type
-  const std::optional<Any> Event(const int32_t &event_type, const Any &payload);
+    // removes the element with event_type if registered
+    void Unhook(const int32_t &event_type);
 
-  // sets the pre-known map from function names to functions
-  void SetFuncMap(
-      const function_mapping
-          &func_map);
+    // executes the function with the specified event type
+    const std::optional<Any> Event(const int32_t &event_type, const Any &payload);
 
-  // gets the event map
-  //  for testing purposes
-  event_mapping
-  GetEventMap();
+    // subscribes a client to a stream internally within func
+    void AddStreamClient(const std::string &client_id, const std::string &stream_type, const Any &args);
 
-  // sets the key value store client for storage
-  void SetKVStoreClient();
+    // returns a message if the server should send a message to the given client
+    // and std::nullopt otherwise
+    const std::optional<Any> StreamSignal(const std::string &client_id);
+    
+    // puts a message in the store for the server to read and send
+    void SetStreamSignal(const std::string &client_id, const std::string &msg);
 
-private:
-  // the unordered map for storing hooked events
-  event_mapping event_map_;
-  // the unordered map for associating function names with functions
-  function_mapping func_map_;
-  // the kvstore client for calls to our backend
-  kvstore_client::KeyValueStoreClient *kvstore_client_;
-  // the mutex for obtaining locks on the unordered map
-  mutable std::shared_mutex mutex_;
-};
+    // clears the stream signal for a particular client
+    void ClearStreamSignal(const std::string &client_id);
+
+    // sets the pre-known map from function names to functions
+    void SetFuncMap(
+        const function_mapping
+            &func_map);
+
+    // gets the event map
+    //  for testing purposes
+    event_mapping
+    GetEventMap();
+
+    void SetStreamMap(const stream_mapping &stream_map);
+  private:
+    // the unordered map for storing hooked events
+    event_mapping event_map_;
+
+    // the unordered map for associating function names with functions
+    function_mapping func_map_;
+
+    stream_mapping stream_map_;
+
+    // the kvstore client for calls to our backend
+    kvstore_client::KeyValueStoreClient *kvstore_client_;
+
+    // the mutex for obtaining locks on the unordered map
+    mutable std::shared_mutex mutex_;
+  };
 } // namespace func

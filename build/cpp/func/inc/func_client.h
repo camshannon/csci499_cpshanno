@@ -1,5 +1,6 @@
 #include <memory>
 #include <string>
+#include <map>
 
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
@@ -14,9 +15,11 @@ using func::HookReply;
 using func::HookRequest;
 using func::UnhookReply;
 using func::UnhookRequest;
+using func::StreamRequest;
 using google::protobuf::Any;
 using grpc::Channel;
 using grpc::ClientContext;
+using grpc::ClientReader;
 using grpc::Status;
 
 namespace func_client {
@@ -30,18 +33,21 @@ public:
 
   // associates this type of event with the given function for future execution
   // by Func
-  void hook(const int32_t &event_type, const std::string &event_function);
+  void Hook(const int32_t &event_type, const std::string &event_function);
 
   // unregisters an event of the given type, if registered.  has no effect if
   // already unregistered.
-  void unhook(const int32_t &event_type);
+  void Unhook(const int32_t &event_type);
 
   // represents an arriving event of the given type with an arbitrary message
   // payload
-  const std::optional<Any> event(const int32_t &event_type, const Any &payload);
+  const std::optional<Any> Event(const int32_t &event_type, const Any &payload);
+
+  // subscribes to a blocking stream, preventing any other calls from the client
+  const bool Stream(const std::string &stream_type, const Any &payload, const std::function<void(const std::string&)>&);
 
 private:
-  // The client object making RPC calls to the func server
+  // The client object making unary RPC calls to the func server
   std::unique_ptr<FuncService::Stub> stub_;
 };
 } // namespace func_client
