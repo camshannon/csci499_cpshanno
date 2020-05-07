@@ -1,7 +1,5 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.13.0)
 
-# Project
 project(kvstore-component)
 
 # Find glog
@@ -10,11 +8,11 @@ find_package(glog REQUIRED)
 # Find GTest
 find_package(GTest REQUIRED)
 
-# Find Protobuf
-find_package(Protobuf REQUIRED)
+#Find Protobuf
+find_package(Protobuf CONFIG REQUIRED)
 
 # Find gRPC
-find_package(GRPC REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 # Find GFlags
 find_package(gflags REQUIRED)
@@ -49,13 +47,15 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 # Create kvstore_server executable
 add_executable(kvstore_server ${SRV_HDRS} ${SRV_SRCS})
-target_link_libraries(kvstore_server PUBLIC gRPC::grpc++
-	${PROTOBUF_LIBRARY}
+target_link_libraries(kvstore_server PUBLIC
 	glog::glog
-	gflags)
+  gflags
+  ${PROTOBUF_LIBRARY}
+  gRPC::grpc++)
 
 # Create kvstore_test executable
 add_executable(kvstore_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(kvstore_test PUBLIC GTest::GTest
-	${PROTOBUF_LIBRARY}
-	glog::glog)
+  glog::glog
+  ${_PROTOBUF_LIBPROTOBUF})
+

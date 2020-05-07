@@ -1,7 +1,5 @@
-# Minimum CMake required
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.13.0)
 
-# Project
 project(func-component)
 
 # Find glog
@@ -11,10 +9,10 @@ find_package(glog REQUIRED)
 find_package(GTest REQUIRED)
 
 # Find Protobuf
-find_package(Protobuf REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
 
 # Find gRPC
-find_package(GRPC REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 # Include header directories
 include_directories(inc 
@@ -65,13 +63,15 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 # Create func_server executable
 add_executable(func_server ${SRV_HDRS} ${SRV_SRCS})
-target_link_libraries(func_server PUBLIC gRPC::grpc++
-	glog::glog
-	${PROTOBUF_LIBRARY})
+target_link_libraries(func_server PUBLIC
+  glog::glog
+  ${PROTOBUF_LIBRARY}
+  gRPC::grpc++)
 
 # Create func_test executable
 add_executable(func_test ${TST_HDRS} ${TST_SRCS})
-target_link_libraries(func_test PUBLIC gRPC::grpc++
+target_link_libraries(func_test PUBLIC
 	GTest::GTest 
-	glog::glog
-	${PROTOBUF_LIBRARY})
+  glog::glog
+  ${PROTOBUF_LIBRARY}
+  gRPC::grpc++)
