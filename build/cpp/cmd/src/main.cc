@@ -10,6 +10,7 @@ DEFINE_string(follow, "", "Starts following the given username.");
 DEFINE_int64(read, -1, "Reads the warble thread starting at the given id.");
 DEFINE_bool(profile, false,
             "Gets the user's profile of following and followers.");
+DEFINE_string(stream, "", "Streams all new warbles containing the given hashtag.");
 
 int main(int argc, char **argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -38,8 +39,11 @@ int main(int argc, char **argv) {
       if (FLAGS_profile) {
         command_line.Profile(FLAGS_user);
       }
+      if (FLAGS_stream != "") {
+        command_line.Stream(FLAGS_stream);
+      }
       if (FLAGS_warble == "" && FLAGS_follow == "" && FLAGS_read == -1 &&
-          !FLAGS_profile) {
+          !FLAGS_profile && FLAGS_stream == "") {
         std::cout << "User flag must be used with other flags." << std::endl;
       }
     } else {

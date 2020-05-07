@@ -65,6 +65,12 @@ public:
   // shows a user's followers and following
   void Profile(const std::string &username);
 
+  // shows all new warbles with the hashtag
+  void Stream(const std::string &hashtag);
+
+  // gets called when stream is received
+  void StreamCallback(const std::string &msg);
+
 private:
   // helper function to recurse through thread
   void ReadHelper(const int64_t &id, int count);

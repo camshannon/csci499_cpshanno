@@ -11,12 +11,13 @@ cmd::CommandLine::~CommandLine() { delete func_client_; }
 
 // hooks the appropriate function ids and functions
 void cmd::CommandLine::Hook() {
-  func_client_->hook(0, "Registeruser");
-  func_client_->hook(1, "Warble");
-  func_client_->hook(2, "Follow");
-  func_client_->hook(3, "Read");
-  func_client_->hook(4, "Profile");
-  std::cout << "Warble functions successfully hooked." << std::endl;
+  func_client_->Hook(0, "Registeruser");
+  func_client_->Hook(1, "Warble");
+  func_client_->Hook(2, "Follow");
+  func_client_->Hook(3, "Read");
+  func_client_->Hook(4, "Profile");
+  func_client_->Hook(1, "Hashtags");
+  std::cout << "Warble functions/streams successfully hooked." << std::endl;
 }
 
 // check if a user for the username exists
@@ -25,7 +26,7 @@ bool cmd::CommandLine::CheckUser(const std::string &username) {
   Any any;
   request.set_username(username);
   any.PackFrom(request);
-  const auto &result = func_client_->event(4, any);
+  const auto &result = func_client_->Event(4, any);
   if (result) {
     return true;
   }
@@ -38,7 +39,7 @@ bool cmd::CommandLine::CheckWarble(const int64_t &id) {
   Any any;
   request.set_warble_id(std::to_string(id));
   any.PackFrom(request);
-  const auto &result = func_client_->event(3, any);
+  const auto &result = func_client_->Event(3, any);
   if (result) {
     return true;
   }
@@ -53,7 +54,7 @@ bool cmd::CommandLine::CheckFollow(const std::string &username,
   Any any;
   request.set_username(username);
   any.PackFrom(request);
-  const auto &result = func_client_->event(4, any);
+  const auto &result = func_client_->Event(4, any);
   result->UnpackTo(&reply);
   for (int i = 0; i < reply.following().size(); i++) {
     if (to_follow == reply.following()[i]) {
@@ -70,7 +71,7 @@ void cmd::CommandLine::RegisterUser(const std::string &username) {
     request.set_username(username);
     Any any;
     any.PackFrom(request);
-    const auto &result = func_client_->event(0, any);
+    const auto &result = func_client_->Event(0, any);
     if (result) {
       std::cout << "Successfully registered user " + username << "."
                 << std::endl;
@@ -107,7 +108,7 @@ void cmd::CommandLine::Warble(const std::string &username,
     }
   }
   any.PackFrom(request);
-  const auto &result = func_client_->event(1, any);
+  const auto &result = func_client_->Event(1, any);
   if (result) {
     result->UnpackTo(&reply);
     std::cout << "(" << reply.warble().username() << ", "
@@ -130,7 +131,7 @@ void cmd::CommandLine::Follow(const std::string &username,
       request.set_username(username);
       request.set_to_follow(to_follow);
       any.PackFrom(request);
-      const auto &result = func_client_->event(2, any);
+      const auto &result = func_client_->Event(2, any);
       if (result) {
         std::cout << "User " << username << " successfully followed user "
                   << to_follow << "." << std::endl;
@@ -162,7 +163,7 @@ void cmd::CommandLine::ReadHelper(const int64_t &id, int count) {
   Any any;
   request.set_warble_id(std::to_string(id));
   any.PackFrom(request);
-  const auto &result = func_client_->event(3, any);
+  const auto &result = func_client_->Event(3, any);
   ReadReply reply;
   result->UnpackTo(&reply);
   for (int i = 0; i < count; i++) {
@@ -189,7 +190,7 @@ void cmd::CommandLine::Profile(const std::string &username) {
   Any any;
   request.set_username(username);
   any.PackFrom(request);
-  const auto &result = func_client_->event(4, any);
+  const auto &result = func_client_->Event(4, any);
   result->UnpackTo(&reply);
   std::cout << "Followers: ";
   for (int i = 1; i < reply.followers().size(); i++) {
@@ -207,4 +208,28 @@ void cmd::CommandLine::Profile(const std::string &username) {
     }
   }
   std::cout << std::endl;
+}
+
+void cmd::CommandLine::StreamCallback(const std::string &msg) {
+  std::cout << "in callback" << std::endl;
+  warble::Warble w;
+  w.ParseFromString(msg);
+  time_t tp = w.timestamp().seconds();
+  auto timestr = asctime(gmtime(&tp));
+  std::cout << "warble from " << w.username() << " at " << timestr << std::endl;
+  std::cout << std::endl << w.text() << std::endl << std::endl;
+}
+
+// subscribes to a stream that prints new warbles containing `hashtag`
+void cmd::CommandLine::Stream(const std::string &hashtag) {
+  std::cout << "Here's what people are saying about " << hashtag << " ...\n\n";
+  warble::StreamRequest request;
+  request.set_hashtag(hashtag);
+  Any args;
+  args.PackFrom(request);
+  // subscribe to the stream
+  auto cb = [this](const std::string &msg) { this->StreamCallback(msg); };
+  if (!func_client_->Stream("Hashtags", args, cb)) { 
+    std::cout << "\nLost connection to the stream.\n";
+  }
 }
