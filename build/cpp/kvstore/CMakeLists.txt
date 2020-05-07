@@ -57,5 +57,6 @@ target_link_libraries(kvstore_server PUBLIC
 add_executable(kvstore_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(kvstore_test PUBLIC GTest::GTest
   glog::glog
-  ${_PROTOBUF_LIBPROTOBUF})
+  ${PROTOBUF_LIBRARY}
+  gRPC::grpc++)
 

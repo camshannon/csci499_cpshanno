@@ -57,6 +57,8 @@ $ ./bin/warble --hook
 
 	`--profile`: gets the user’s profile of following and followers
 
+  `--stream "#<hashtag>"`: streams all new warbles containing the given hashtag
+
 ## Optional
 
 To see all logging information, run servers and application with `GLOG_logtostderr`, for example:

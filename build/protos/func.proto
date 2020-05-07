@@ -11,6 +11,9 @@ message HookRequest {
 
   // A string known to Func that represents a function that can process an event of type `event_type`
   string event_function = 2;
+
+  // Whether the Hook request applies to a stream handler or not (defaults to event handler)
+  bool stream = 3;
 }
 
 message HookReply {
@@ -37,8 +40,15 @@ message EventReply {
   google.protobuf.Any payload = 1;
 }
 
+// Represents an arriving event that subscribes to a stream
+message StreamRequest {
+  string stream_type = 1;
+  google.protobuf.Any payload = 2;
+}
+
 service FuncService {
   rpc hook (HookRequest) returns (HookReply) {}
   rpc unhook (UnhookRequest) returns (UnhookReply) {}
   rpc event (EventRequest) returns (EventReply) {}
+  rpc stream (StreamRequest) returns (stream EventReply) {}
 }
