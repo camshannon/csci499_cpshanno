@@ -11,6 +11,9 @@ find_package(GTest REQUIRED)
 # Find Protobuf
 find_package(Protobuf CONFIG REQUIRED)
 
+# find gRPC
+find_package(gRPC CONFIG REQUIRED)
+
 # Include header directory
 include_directories(inc)
 
@@ -30,4 +33,5 @@ set(TST_SRCS src/warble_test.cc
 add_executable(warble_test ${TST_HDRS} ${TST_SRCS})
 target_link_libraries(warble_test PUBLIC GTest::GTest 
 	glog::glog
-	${PROTOBUF_LIBRARY})
+  ${PROTOBUF_LIBRARY}
+  gRPC::grpc++)

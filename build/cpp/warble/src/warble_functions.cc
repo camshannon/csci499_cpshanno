@@ -52,6 +52,7 @@ warble_functions::WarbleRequestPackager(const Any &any) {
   std::string serialized_warble;
   warble.SerializeToString(&serialized_warble);
   std::vector<std::tuple<int, std::string, std::string>> puts;
+
   // if parent id is empty, it is a base warble
   // otherwise, add the warble to the parent id
   if (warble.parent_id() != "") {
@@ -68,8 +69,13 @@ warble_functions::WarbleRequestPackager(const Any &any) {
         std::make_tuple(0, "warble_" + warble.id(), serialized_warble);
     puts.push_back(warble_put);
   }
+  // send this warble to all the relevant stream clients
+  std::cout << "adding puts" << std::endl;
+  puts.push_back(std::make_tuple(3, "Hashtags", serialized_warble));
   return puts;
 }
+
+
 
 // receives a warble and packages it in a warble reply for the frontend
 const Any warble_functions::WarbleReplyPackager(
@@ -168,4 +174,42 @@ const Any warble_functions::ProfileReplyPackager(
   Any any;
   any.PackFrom(reply);
   return any;
+}
+
+static const std::vector<std::string> FindHashtags(const std::string &text) {
+  std::vector<std::string> hashtags;
+  std::cout << "in FINDHASHTAGS\n";
+  std::cout << text << std::endl;
+  for (size_t i = 0; i < text.length(); ++i) {
+    if (text[i] == '#') {
+      std::cout << "FOUND THE HASHTAG CHARACTER\n";
+      std::string hash;
+      while (!isspace(text[i]) && i < text.length()) {
+        hash += text[i++];
+      }
+      LOG(INFO) << "Found hashtag :: " << hash;
+      hashtags.push_back(hash);
+    }
+  }
+  return hashtags;
+}
+
+// returns a list of clients that should be streamed given the streaming payload and current 
+// clients associated with the hashtag stream type
+const std::vector<std::string> warble_functions::StreamHandler(const std::vector<std::pair<std::string, Any>> &clients, const std::string &warble) {
+  LOG(INFO) << "StreamHandler function called for hashtag stream type";
+  warble::Warble w;
+  w.ParseFromString(warble);
+  const std::vector<std::string> hashes = FindHashtags(w.text());
+  std::vector<std::string> ret;
+  for (auto pair : clients) {
+    auto id = pair.first;
+    auto args = pair.second;
+    warble::StreamRequest req;
+    args.UnpackTo(&req);
+    if (std::find(hashes.begin(), hashes.end(), req.hashtag()) != hashes.end()) {
+      ret.push_back(id);
+    }
+  }
+  return ret;
 }
