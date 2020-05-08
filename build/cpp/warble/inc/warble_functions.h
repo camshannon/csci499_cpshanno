@@ -27,7 +27,8 @@ using warble::WarbleRequest;
 // request vector type for func calls
 //  the vector size is the number of calls being made to func
 //  the int indicates the request type
-//   0 for puts, 1 for gets, 2 for removes, 3 for stream notifications, and -1 for an error
+//   0 for puts, 1 for gets, 2 for removes, 3 for stream notifications, and -1
+//   for an error
 //  the first string indicates the key, or streamID if the int is 3
 //  the second string is the value for puts or empty string
 using request_vector = std::vector<std::tuple<int, std::string, std::string>>;
@@ -44,8 +45,10 @@ using function_mapping = std::unordered_map<
                   std::vector<std::tuple<int, std::string, std::string>>(Any)>,
               std::function<Any(std::vector<std::vector<std::string>>)>>>;
 
-//map type for stream handler functions
-using stream_mapping = std::unordered_map<std::string, std::function<std::vector<std::string>(std::vector<std::pair<std::string, Any>>, std::string)>>;
+// map type for stream handler functions
+using stream_mapping = std::unordered_map<
+    std::string, std::function<std::vector<std::string>(
+                     std::vector<std::pair<std::string, Any>>, std::string)>>;
 
 namespace warble_functions {
 
@@ -127,24 +130,24 @@ const request_vector ProfileRequestPackager(const Any &any);
 const Any ProfileReplyPackager(const reply_vector &result);
 
 // returns a list of clients that should be streamed given the streaming payload
-const std::vector<std::string> StreamHandler(const std::vector<std::pair<std::string, Any>> &clients, const std::string &warble);
+const std::vector<std::string> StreamHandler(
+    const std::vector<std::pair<std::string, Any>> &clients,
+    const std::string &warble);
 
-// parses the text for all hashtags, defined as the string of 
+// parses the text for all hashtags, defined as the string of
 // contiguous non-whitespace characters that follow a '#'
 const std::vector<std::string> FindHashtags(const std::string &text);
 
 // the unordered map for associating function names with functions
 //  function names map to request function and reply function
 const function_mapping func_map{
-  {"Registeruser", std::make_pair(RegisteruserRequestPackager, RegisteruserReplyPackager)},
-  {"Warble", std::make_pair(WarbleRequestPackager, WarbleReplyPackager)},
-  {"Follow", std::make_pair(FollowRequestPackager, FollowReplyPackager)},
-  {"Read", std::make_pair(ReadRequestPackager, ReadReplyPackager)},
-  {"Profile", std::make_pair(ProfileRequestPackager, ProfileReplyPackager)}
-};
+    {"Registeruser",
+     std::make_pair(RegisteruserRequestPackager, RegisteruserReplyPackager)},
+    {"Warble", std::make_pair(WarbleRequestPackager, WarbleReplyPackager)},
+    {"Follow", std::make_pair(FollowRequestPackager, FollowReplyPackager)},
+    {"Read", std::make_pair(ReadRequestPackager, ReadReplyPackager)},
+    {"Profile", std::make_pair(ProfileRequestPackager, ProfileReplyPackager)}};
 
-const stream_mapping stream_map{
-  {"Hashtags", StreamHandler}
-};
+const stream_mapping stream_map{{"Hashtags", StreamHandler}};
 
 }  // namespace warble_functions

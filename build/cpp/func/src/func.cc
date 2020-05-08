@@ -57,18 +57,18 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
       kvstore_client_->remove(key);
       values.push_back(value);
     }
-    
+
     // stream notification
     else if (request_type == 3) {
       // get clients subscribed to this stream type
       std::cout << "got a stream request_type" << std::endl;
-      const auto &optional_values = kvstore_client_->get("stream_"+key+"_");
+      const auto &optional_values = kvstore_client_->get("stream_" + key + "_");
       if (optional_values) {
         std::cout << "found keys of proper type\n";
         std::vector<std::pair<std::string, Any>> clients;
         for (std::string id : *optional_values) {
           std::cout << "client id " << id << std::endl;
-          const auto &op_args = kvstore_client_->get("stream_args_"+id+"_");
+          const auto &op_args = kvstore_client_->get("stream_args_" + id + "_");
           if (op_args && op_args->size()) {
             Any args;
             args.ParseFromString(op_args->at(0));
@@ -81,7 +81,7 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
         // put the warble for the selected clients
         for (auto id : selected) SetStreamSignal(id, value);
       }
-   }
+    }
     // error request
     else if (request_type == -1) {
       return {};
@@ -92,9 +92,7 @@ const std::optional<Any> func::Func::Event(const int32_t &event_type,
 }
 
 // sets the pre-known map from function names to functions
-void func::Func::SetFuncMap(
-    const function_mapping
-        &func_map) {
+void func::Func::SetFuncMap(const function_mapping &func_map) {
   func_map_ = func_map;
 }
 
@@ -104,45 +102,49 @@ void func::Func::SetStreamMap(const stream_mapping &stream_map) {
 
 // gets the event map
 //  for testing purposes
-event_mapping
-func::Func::GetEventMap() {
-  return event_map_;
-}
+event_mapping func::Func::GetEventMap() { return event_map_; }
 
 // subscribes a client to a stream internally within func
-void func::Func::AddStreamClient(const std::string &client_id, const std::string &stream_type, const Any &args) {
-  kvstore_client_->put("stream_"+stream_type+"_", client_id);
-  kvstore_client_->put("stream_args_"+client_id+"_", args.SerializeAsString());
+void func::Func::AddStreamClient(const std::string &client_id,
+                                 const std::string &stream_type,
+                                 const Any &args) {
+  kvstore_client_->put("stream_" + stream_type + "_", client_id);
+  kvstore_client_->put("stream_args_" + client_id + "_",
+                       args.SerializeAsString());
 }
 
 // removes client from its stream
-void func::Func::RemoveStreamClient(const std::string &client_id, const std::string &stream_type) {
-  kvstore_client_->remove("stream_"+stream_type+"_");
-  kvstore_client_->remove("stream_args_"+client_id+"_");
+void func::Func::RemoveStreamClient(const std::string &client_id,
+                                    const std::string &stream_type) {
+  kvstore_client_->remove("stream_" + stream_type + "_");
+  kvstore_client_->remove("stream_args_" + client_id + "_");
 }
 
 // returns true if this client is still attached to its stream
-bool func::Func::ClientExists(const std::string &client_id, const std::string &stream_type) {
-  auto id = kvstore_client_->get("stream_"+stream_type+"_");
+bool func::Func::ClientExists(const std::string &client_id,
+                              const std::string &stream_type) {
+  auto id = kvstore_client_->get("stream_" + stream_type + "_");
   if (!id) return false;
   return (std::find(id->begin(), id->end(), client_id) != id->end());
 }
 
 // mutator method for the stream signal
-void func::Func::SetStreamSignal(const std::string &client_id, const std::string &msg) {
-  kvstore_client_->put("stream_"+client_id+"_", msg);
+void func::Func::SetStreamSignal(const std::string &client_id,
+                                 const std::string &msg) {
+  kvstore_client_->put("stream_" + client_id + "_", msg);
 }
 
 // clears the stream signal for a client
 void func::Func::ClearStreamSignal(const std::string &client_id) {
-  kvstore_client_->remove("stream_"+client_id+"_");
+  kvstore_client_->remove("stream_" + client_id + "_");
 }
 
-// returns a message that the server needs to send to the given client over a stream
-// or nothing, if there isn't anything to send
-const std::optional<Any> func::Func::StreamSignal(const std::string &client_id) {
+// returns a message that the server needs to send to the given client over a
+// stream or nothing, if there isn't anything to send
+const std::optional<Any> func::Func::StreamSignal(
+    const std::string &client_id) {
   std::cout << client_id << std::endl;
-  auto values = kvstore_client_->get("stream_"+client_id+"_");
+  auto values = kvstore_client_->get("stream_" + client_id + "_");
   if (values && values->size()) {
     Any payload;
     if (payload.ParseFromString(values->at(0))) {

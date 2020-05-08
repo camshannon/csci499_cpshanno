@@ -10,8 +10,8 @@ DEFINE_string(follow, "", "Starts following the given username.");
 DEFINE_int64(read, -1, "Reads the warble thread starting at the given id.");
 DEFINE_bool(profile, false,
             "Gets the user's profile of following and followers.");
-DEFINE_string(stream, "", "Streams all new warbles containing the given hashtag.");
-
+DEFINE_string(stream, "",
+              "Streams all new warbles containing the given hashtag.");
 
 cmd::CommandLine* command_line;
 void SignalHandler(int signum) {
@@ -26,11 +26,11 @@ void sig() {
   signal(SIGTERM, SignalHandler);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
   command_line = new cmd::CommandLine();
-  std::thread s(sig); // catches disconnect signal
+  std::thread s(sig);  // catches disconnect signal
   // Hook
   if (FLAGS_hook && FLAGS_registeruser == "" && FLAGS_user == "" &&
       FLAGS_warble == "" && FLAGS_reply == -1 && FLAGS_follow == "" &&
@@ -57,7 +57,8 @@ int main(int argc, char **argv) {
       if (FLAGS_stream != "") {
         // validate hashtag
         if (FLAGS_stream[0] != '#') {
-          std::cout << "Stream must be called with a hashtag. You may need to put quotes around it.\nExample: --stream \"#hello\"\n";
+          std::cout << "Stream must be called with a hashtag. You may need to "
+                       "put quotes around it.\nExample: --stream \"#hello\"\n";
         } else {
           for (char c : FLAGS_stream) {
             if (isspace(c)) {

@@ -1,23 +1,23 @@
-#include <memory>
-#include <string>
-#include <map>
-
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
+
+#include <map>
+#include <memory>
+#include <string>
 
 #include "func.grpc.pb.h"
 #include "func.pb.h"
 
+using func::DisconnectReply;
+using func::DisconnectRequest;
 using func::EventReply;
 using func::EventRequest;
 using func::FuncService;
 using func::HookReply;
 using func::HookRequest;
+using func::StreamRequest;
 using func::UnhookReply;
 using func::UnhookRequest;
-using func::StreamRequest;
-using func::DisconnectRequest;
-using func::DisconnectReply;
 using google::protobuf::Any;
 using grpc::Channel;
 using grpc::ClientContext;
@@ -28,7 +28,7 @@ namespace func_client {
 
 // the func client
 class FuncServiceClient {
-public:
+ public:
   // func client constructor
   FuncServiceClient(std::shared_ptr<Channel> channel)
       : stub_(FuncService::NewStub(channel)) {}
@@ -46,13 +46,15 @@ public:
   const std::optional<Any> Event(const int32_t &event_type, const Any &payload);
 
   // subscribes to a blocking stream, preventing any other calls from the client
-  const bool Stream(const std::string &stream_type, const Any &payload, const std::function<void(const std::string&)>&, const std::function<void(const std::string&)>&);
+  const bool Stream(const std::string &stream_type, const Any &payload,
+                    const std::function<void(const std::string &)> &,
+                    const std::function<void(const std::string &)> &);
 
   // disconnects client from its stream type
   void Disconnect(const std::string &id, const std::string &stream_type);
 
-private:
+ private:
   // The client object making unary RPC calls to the func server
   std::unique_ptr<FuncService::Stub> stub_;
 };
-} // namespace func_client
+}  // namespace func_client

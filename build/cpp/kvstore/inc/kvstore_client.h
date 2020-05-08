@@ -1,8 +1,8 @@
-#include <memory>
-#include <string>
-
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
+
+#include <memory>
+#include <string>
 
 #include "kvstore.grpc.pb.h"
 
@@ -21,7 +21,7 @@ namespace kvstore_client {
 
 // the key value store client
 class KeyValueStoreClient {
-public:
+ public:
   // key value store client constructor
   KeyValueStoreClient(std::shared_ptr<Channel> channel)
       : stub_(KeyValueStore::NewStub(channel)) {}
@@ -35,8 +35,8 @@ public:
   // removes an element from the key value store
   void remove(const std::string &key);
 
-private:
+ private:
   // The client object making RPC calls to the kvstore server
   std::unique_ptr<KeyValueStore::Stub> stub_;
 };
-} // namespace kvstore_client
+}  // namespace kvstore_client

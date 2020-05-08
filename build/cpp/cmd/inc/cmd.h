@@ -1,12 +1,12 @@
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <time.h>
-#include <thread>
-
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include <iostream>
+#include <string>
+#include <thread>
 
 #include "func_client.h"
 #include "warble.pb.h"
@@ -28,7 +28,7 @@ using warble::WarbleRequest;
 namespace cmd {
 // the command line tools
 class CommandLine {
-public:
+ public:
   // command line tools constructor
   CommandLine();
 
@@ -72,7 +72,7 @@ public:
   // gets called when stream is received
   void StreamCallback(const std::string &msg);
 
-private:
+ private:
   // helper function to recurse through thread
   void ReadHelper(const int64_t &id, int count);
 
@@ -82,4 +82,4 @@ private:
   // cmd client id
   std::string client_id_, stream_type_;
 };
-} // namespace cmd
+}  // namespace cmd

@@ -7,12 +7,12 @@ cmd::CommandLine::CommandLine() {
 }
 
 // command line tools destructor
-cmd::CommandLine::~CommandLine() { 
+cmd::CommandLine::~CommandLine() {
   if (client_id_ != "" && stream_type_ != "") {
     std::cout << "\nDisconnecting from stream ..." << std::endl;
     func_client_->Disconnect(client_id_, stream_type_);
   }
-  delete func_client_; 
+  delete func_client_;
 }
 
 // hooks the appropriate function ids and functions
@@ -226,18 +226,17 @@ void cmd::CommandLine::StreamCallback(const std::string &msg) {
 
 // subscribes to a stream that prints new warbles containing `hashtag`
 void cmd::CommandLine::Stream(const std::string &hashtag) {
-  std::cout << "\nHere's what people are saying about " << hashtag << " ...\n\n";
+  std::cout << "\nHere's what people are saying about " << hashtag
+            << " ...\n\n";
   warble::StreamRequest request;
   request.set_hashtag(hashtag);
   Any args;
   args.PackFrom(request);
   // subscribe to the stream
   stream_type_ = "Hashtags";
-  auto init = [this](auto id) {
-    this->client_id_ = id;
-  };
+  auto init = [this](auto id) { this->client_id_ = id; };
   auto cb = [this](const std::string &msg) { this->StreamCallback(msg); };
-  if (!func_client_->Stream("Hashtags", args, init, cb)) { 
+  if (!func_client_->Stream("Hashtags", args, init, cb)) {
     std::cout << "\nLost connection to the stream.\n";
   }
 }

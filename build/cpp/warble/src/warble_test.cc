@@ -12,7 +12,7 @@ TEST(WarbleFunctions, RegisteruserRequestPackager) {
   const auto &following_put = puts[0];
   const auto &followers_put = puts[1];
   EXPECT_EQ(std::get<0>(following_put), 0);
-  EXPECT_EQ(std::get<1>(following_put),  "username_0_following");
+  EXPECT_EQ(std::get<1>(following_put), "username_0_following");
   EXPECT_EQ(std::get<2>(following_put), "");
   EXPECT_EQ(std::get<0>(followers_put), 0);
   EXPECT_EQ(std::get<1>(followers_put), "username_0_followers");
@@ -21,9 +21,10 @@ TEST(WarbleFunctions, RegisteruserRequestPackager) {
 
 // test register user reply packager
 TEST(WarbleFunctions, RegisteruserReplyPackager) {
-  std::vector<std::vector<std::string>> result { {"username_0"} };
+  std::vector<std::vector<std::string>> result{{"username_0"}};
   RegisteruserReply reply;
-  const auto &any = (warble_functions::func_map.at("Registeruser").second)(result);
+  const auto &any =
+      (warble_functions::func_map.at("Registeruser").second)(result);
   EXPECT_TRUE(any.UnpackTo(&reply));
 }
 
@@ -95,7 +96,7 @@ TEST(WarbleFunctions, WarbleReplyPackager) {
   (*warble.mutable_timestamp()).set_seconds(1583746176);
   (*warble.mutable_timestamp()).set_useconds(1583746176242768);
   warble.SerializeToString(&serialized_warble);
-  std::vector<std::vector<std::string>> result { {serialized_warble} };
+  std::vector<std::vector<std::string>> result{{serialized_warble}};
   const auto &any = (warble_functions::func_map.at("Warble").second)(result);
   any.UnpackTo(&reply);
   warble = reply.warble();
@@ -129,8 +130,7 @@ TEST(WarbleFunctons, FollowRequestPackager) {
 // test follow reply packager
 TEST(WarbleFunctions, FollowReplyPackager) {
   FollowReply reply;
-  std::vector<std::vector<std::string>> result { {"username_1"}
-                                               , {"username_0"} };
+  std::vector<std::vector<std::string>> result{{"username_1"}, {"username_0"}};
   const auto &any = (warble_functions::func_map.at("Follow").second)(result);
   EXPECT_TRUE(any.UnpackTo(&reply));
 }
@@ -141,7 +141,8 @@ TEST(WarbleFunctions, ReadRequestPackager) {
   Any any;
   request.set_warble_id("0");
   any.PackFrom(request);
-  const auto &read_vector_from_request = (warble_functions::func_map.at("Read").first)(any);
+  const auto &read_vector_from_request =
+      (warble_functions::func_map.at("Read").first)(any);
   const auto &read_tuple_from_request = read_vector_from_request[0];
   EXPECT_EQ(std::get<0>(read_tuple_from_request), 1);
   EXPECT_EQ(std::get<1>(read_tuple_from_request), "warble_0");
@@ -160,7 +161,7 @@ TEST(WarbleFunctions, ReadReplyPackager) {
   (*warble.mutable_timestamp()).set_seconds(1583746176);
   (*warble.mutable_timestamp()).set_useconds(1583746176242768);
   warble.SerializeToString(&serialized_warble);
-  std::vector<std::vector<std::string>> result { {serialized_warble} };
+  std::vector<std::vector<std::string>> result{{serialized_warble}};
   const auto &any = (warble_functions::func_map.at("Read").second)(result);
   any.UnpackTo(&reply);
   const auto &warbles = reply.warbles();
@@ -192,8 +193,8 @@ TEST(WarbleFunctions, ProfileRequest) {
 // test profile reply
 TEST(WarbleFunctions, ProfileReply) {
   ProfileReply reply;
-  std::vector<std::vector<std::string>> result { {"username_1", "username_2"}
-                                               , {"username_3", "username_4"} };
+  std::vector<std::vector<std::string>> result{{"username_1", "username_2"},
+                                               {"username_3", "username_4"}};
   const auto &any = (warble_functions::func_map.at("Profile").second)(result);
   any.UnpackTo(&reply);
   const auto &followers = reply.followers();
@@ -223,7 +224,8 @@ TEST(WarbleFunctions, StreamHandler) {
   }
   Warble w;
   w.set_text("Contains #one");
-  std::vector<std::string> res = warble_functions::StreamHandler(clients, w.SerializeAsString());
+  std::vector<std::string> res =
+      warble_functions::StreamHandler(clients, w.SerializeAsString());
   EXPECT_EQ(res.size(), 1);
   EXPECT_EQ(res[0], "0");
   w.set_text("Contains #two");
@@ -235,7 +237,7 @@ TEST(WarbleFunctions, StreamHandler) {
   EXPECT_EQ(res.size(), 2);
   EXPECT_TRUE(std::find(res.begin(), res.end(), "1") != res.end());
   EXPECT_TRUE(std::find(res.begin(), res.end(), "2") != res.end());
-  w.set_text("Contains #4"); // hash that no one is subscribed to
+  w.set_text("Contains #4");  // hash that no one is subscribed to
   res = warble_functions::StreamHandler(clients, w.SerializeAsString());
   EXPECT_EQ(res.size(), 0);
 }
@@ -247,21 +249,22 @@ TEST(WarbleFunctions, FindHashtags) {
   std::string endhash("this is a hashtag at the #end");
   std::string tabhash("there is a tab after #this\t hash");
   std::string multihash("#there #are #tons #of #hashtags in #this #string");
-  std::vector<std::pair<std::string, std::vector<std::string>>> map {
-    std::make_pair(nohash, std::vector<std::string>{}), 
-    std::make_pair(onehash, std::vector<std::string>{"#one"}),
-    std::make_pair(endhash, std::vector<std::string>{"#end"}),
-    std::make_pair(tabhash, std::vector<std::string>{"#this"}),
-    std::make_pair(multihash, std::vector<std::string>{"#there", "#are", "#tons", "#of", "#hashtags", "#this", "#string"})
-  };
+  std::vector<std::pair<std::string, std::vector<std::string>>> map{
+      std::make_pair(nohash, std::vector<std::string>{}),
+      std::make_pair(onehash, std::vector<std::string>{"#one"}),
+      std::make_pair(endhash, std::vector<std::string>{"#end"}),
+      std::make_pair(tabhash, std::vector<std::string>{"#this"}),
+      std::make_pair(multihash, std::vector<std::string>{
+                                    "#there", "#are", "#tons", "#of",
+                                    "#hashtags", "#this", "#string"})};
   for (auto pair : map) {
     auto res = warble_functions::FindHashtags(pair.first);
     EXPECT_EQ(res.size(), pair.second.size());
-    for (auto r : res) 
-      EXPECT_TRUE(std::find(pair.second.begin(), pair.second.end(), r) != pair.second.end());
+    for (auto r : res)
+      EXPECT_TRUE(std::find(pair.second.begin(), pair.second.end(), r) !=
+                  pair.second.end());
   }
 }
-
 
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);

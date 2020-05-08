@@ -1,6 +1,7 @@
+#include "func.h"
+
 #include <gtest/gtest.h>
 
-#include "func.h"
 #include "warble_functions.h"
 
 // test hook and unhook
