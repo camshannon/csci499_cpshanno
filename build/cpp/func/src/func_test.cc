@@ -48,8 +48,37 @@ TEST(Func, GetEvent) {
   any.PackFrom(request);
   const auto &optional_any = func.Event(0, any);
   optional_any->UnpackTo(&reply);
-  EXPECT_EQ(reply.following()[0], "username_0");
-  EXPECT_EQ(reply.followers()[0], "username_0");
+  EXPECT_EQ(reply.following()[0], "");
+  EXPECT_EQ(reply.followers()[0], "");
+}
+
+// tests stream signal related methods
+// adds, modifies, and removes a message to a specific client
+TEST(Func, StreamSignal) {
+  func::Func func;
+  // clear incase a fresh db was not used
+  func.ClearStreamSignal("1");
+  warble::StreamRequest request;
+  request.set_hashtag("message");
+  auto res = func.StreamSignal("1");
+  EXPECT_TRUE(res == std::nullopt);
+  func.SetStreamSignal("1", request.SerializeAsString());
+  res = func.StreamSignal("1");
+  EXPECT_FALSE(res == std::nullopt);
+  if (res) {
+    res->UnpackTo(&request);
+    EXPECT_EQ(request.hashtag(), "message");
+  }
+  func.ClearStreamSignal("1");
+  EXPECT_TRUE(func.StreamSignal("1") == std::nullopt);
+  request.set_hashtag("different");
+  func.SetStreamSignal("1", request.SerializeAsString());
+  res = func.StreamSignal("1");
+  EXPECT_FALSE(res == std::nullopt);
+  if (res) {
+    res->UnpackTo(&request);
+    EXPECT_EQ(request.hashtag(), "different");
+  }
 }
 
 int main(int argc, char **argv) {

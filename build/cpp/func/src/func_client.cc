@@ -54,8 +54,9 @@ func_client::FuncServiceClient::Event(const int32_t &event_type,
   return {reply.payload()};
 }
 
-
-const bool func_client::FuncServiceClient::Stream(const std::string &stream_type, const Any &payload, const std::function<void(const std::string &)> &callback) {
+// sends stream request to func server and reads responses
+// transfers messages to callback function given by cmdline
+const bool func_client::FuncServiceClient::Stream(const std::string &stream_type, const Any &payload, const std::function<void(const std::string &)> &init, const std::function<void(const std::string &)> &callback) {
   StreamRequest request;
   request.set_stream_type(stream_type);
   *request.mutable_payload() = payload;
@@ -64,14 +65,23 @@ const bool func_client::FuncServiceClient::Stream(const std::string &stream_type
   // set the reader of this client instance
   std::unique_ptr<ClientReader<EventReply>> reader(stub_->stream(&context, request));
   reader->WaitForInitialMetadata();
-  auto metamap = context.GetServerInitialMetadata();
-  std::cout << "server metadata:" << std::endl;
-  for (auto itr = metamap.begin(); itr != metamap.end(); ++itr) {
-    std::cout << itr->first << " :: " << itr->second << std::endl;
+  auto map = context.GetServerInitialMetadata();
+  if (auto itr = map.find("id"); itr != map.end()) {
+    init(itr->second.data()); // relay client ID back to server for DC
   }
   while (reader->Read(&reply)) {
-    std::cout << "got a reply!" << std::endl;
-    std::cout << reply.payload().SerializeAsString() << std::endl;
     callback(reply.payload().SerializeAsString());
   }
+  reader->Finish();
 } 
+
+// sends dc request to func server 
+void func_client::FuncServiceClient::Disconnect(const std::string &id, const std::string &stream_type) {
+  LOG(INFO) << "Disconnecting from stream, client id :: " << id;
+  ClientContext context;
+  DisconnectRequest request;
+  DisconnectReply _;
+  request.set_id(id);
+  request.set_type(stream_type); 
+  stub_->disconnect(&context, request, &_);
+}

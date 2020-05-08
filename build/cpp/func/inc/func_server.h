@@ -16,6 +16,8 @@ using grpc::ServerContext;
 using grpc::ServerWriter;
 using grpc::Status;
 using grpc::StatusCode;
+using func::DisconnectRequest;
+using func::DisconnectReply;
 
 namespace func_server
 {
@@ -41,6 +43,9 @@ namespace func_server
 
     // represents an arriving event that expects a streamed response
     Status stream(ServerContext *context, const StreamRequest *request, ServerWriter<EventReply> *writer) override;
+
+    // pipe function for disconnecting clients from streams
+    Status disconnect(ServerContext *context, const DisconnectRequest *request, DisconnectReply *reply) override;
 
     // sets the pre-known map from function names to functions
     void SetFuncMap(

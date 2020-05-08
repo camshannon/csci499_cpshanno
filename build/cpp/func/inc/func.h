@@ -63,6 +63,12 @@ namespace func
 
     // subscribes a client to a stream internally within func
     void AddStreamClient(const std::string &client_id, const std::string &stream_type, const Any &args);
+    
+    // removes client from stream
+    void RemoveStreamClient(const std::string &client_id, const std::string &stream_type);
+
+    // returns true if this client is still attached to its stream
+    bool ClientExists(const std::string &client_id, const std::string &stream_type);
 
     // returns a message if the server should send a message to the given client
     // and std::nullopt otherwise

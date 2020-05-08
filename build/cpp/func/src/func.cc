@@ -115,6 +115,19 @@ void func::Func::AddStreamClient(const std::string &client_id, const std::string
   kvstore_client_->put("stream_args_"+client_id+"_", args.SerializeAsString());
 }
 
+// removes client from its stream
+void func::Func::RemoveStreamClient(const std::string &client_id, const std::string &stream_type) {
+  kvstore_client_->remove("stream_"+stream_type+"_");
+  kvstore_client_->remove("stream_args_"+client_id+"_");
+}
+
+// returns true if this client is still attached to its stream
+bool func::Func::ClientExists(const std::string &client_id, const std::string &stream_type) {
+  auto id = kvstore_client_->get("stream_"+stream_type+"_");
+  if (!id) return false;
+  return (std::find(id->begin(), id->end(), client_id) != id->end());
+}
+
 // mutator method for the stream signal
 void func::Func::SetStreamSignal(const std::string &client_id, const std::string &msg) {
   kvstore_client_->put("stream_"+client_id+"_", msg);
@@ -128,6 +141,7 @@ void func::Func::ClearStreamSignal(const std::string &client_id) {
 // returns a message that the server needs to send to the given client over a stream
 // or nothing, if there isn't anything to send
 const std::optional<Any> func::Func::StreamSignal(const std::string &client_id) {
+  std::cout << client_id << std::endl;
   auto values = kvstore_client_->get("stream_"+client_id+"_");
   if (values && values->size()) {
     Any payload;

@@ -43,16 +43,13 @@ Status func_server::FuncServiceImpl::event(ServerContext *context,
 // represents an event request that reads from a stream
 Status func_server::FuncServiceImpl::stream(ServerContext *context, const StreamRequest *request, ServerWriter<EventReply> *writer) {
   LOG(INFO) << "Stream commenced in func_server";
-  LOG(INFO) << "Auth context stuff";
-  for (auto sref : context->auth_context()->GetPeerIdentity()) {
-    LOG(INFO) << "found property :: " << sref.data();
-  }
-  context->AddInitialMetadata("connected", "yes");
-  writer->SendInitialMetadata();
   auto id = std::to_string(reinterpret_cast<uint64_t>(context));
-  func_.AddStreamClient(id, request->stream_type(), request->payload());
+  auto type = request->stream_type();
+  func_.AddStreamClient(id, type, request->payload());
+  context->AddInitialMetadata("id", id);
+  writer->SendInitialMetadata();
   // poll for updates
-  while (1) {
+  while (func_.ClientExists(id, type)) {
     auto message = func_.StreamSignal(id);
     if (message) {
       EventReply reply;
@@ -64,6 +61,14 @@ Status func_server::FuncServiceImpl::stream(ServerContext *context, const Stream
     }
   }
   // should never reach here, but required for compilation
+  return Status::CANCELLED;
+}
+
+// disconnect client from stream
+Status func_server::FuncServiceImpl::disconnect(ServerContext *context, const DisconnectRequest *request, DisconnectReply *reply) {
+  auto id = request->id();
+  auto type = request->type();
+  func_.RemoveStreamClient(id, type);
   return Status::OK;
 }
 

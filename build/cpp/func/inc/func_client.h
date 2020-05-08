@@ -16,6 +16,8 @@ using func::HookRequest;
 using func::UnhookReply;
 using func::UnhookRequest;
 using func::StreamRequest;
+using func::DisconnectRequest;
+using func::DisconnectReply;
 using google::protobuf::Any;
 using grpc::Channel;
 using grpc::ClientContext;
@@ -44,7 +46,10 @@ public:
   const std::optional<Any> Event(const int32_t &event_type, const Any &payload);
 
   // subscribes to a blocking stream, preventing any other calls from the client
-  const bool Stream(const std::string &stream_type, const Any &payload, const std::function<void(const std::string&)>&);
+  const bool Stream(const std::string &stream_type, const Any &payload, const std::function<void(const std::string&)>&, const std::function<void(const std::string&)>&);
+
+  // disconnects client from its stream type
+  void Disconnect(const std::string &id, const std::string &stream_type);
 
 private:
   // The client object making unary RPC calls to the func server
