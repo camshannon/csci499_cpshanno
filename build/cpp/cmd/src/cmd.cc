@@ -7,7 +7,13 @@ cmd::CommandLine::CommandLine() {
 }
 
 // command line tools destructor
-cmd::CommandLine::~CommandLine() { delete func_client_; }
+cmd::CommandLine::~CommandLine() { 
+  if (client_id_ != "" && stream_type_ != "") {
+    std::cout << "\nDisconnecting from stream ..." << std::endl;
+    func_client_->Disconnect(client_id_, stream_type_);
+  }
+  delete func_client_; 
+}
 
 // hooks the appropriate function ids and functions
 void cmd::CommandLine::Hook() {
@@ -16,7 +22,6 @@ void cmd::CommandLine::Hook() {
   func_client_->Hook(2, "Follow");
   func_client_->Hook(3, "Read");
   func_client_->Hook(4, "Profile");
-  func_client_->Hook(1, "Hashtags");
   std::cout << "Warble functions/streams successfully hooked." << std::endl;
 }
 
@@ -211,25 +216,28 @@ void cmd::CommandLine::Profile(const std::string &username) {
 }
 
 void cmd::CommandLine::StreamCallback(const std::string &msg) {
-  std::cout << "in callback" << std::endl;
   warble::Warble w;
   w.ParseFromString(msg);
   time_t tp = w.timestamp().seconds();
   auto timestr = asctime(gmtime(&tp));
-  std::cout << "warble from " << w.username() << " at " << timestr << std::endl;
-  std::cout << std::endl << w.text() << std::endl << std::endl;
+  std::cout << " Warble from: " << w.username() << "\n at " << timestr << "\n";
+  std::cout << "   > " << w.text() << std::endl << std::endl;
 }
 
 // subscribes to a stream that prints new warbles containing `hashtag`
 void cmd::CommandLine::Stream(const std::string &hashtag) {
-  std::cout << "Here's what people are saying about " << hashtag << " ...\n\n";
+  std::cout << "\nHere's what people are saying about " << hashtag << " ...\n\n";
   warble::StreamRequest request;
   request.set_hashtag(hashtag);
   Any args;
   args.PackFrom(request);
   // subscribe to the stream
+  stream_type_ = "Hashtags";
+  auto init = [this](auto id) {
+    this->client_id_ = id;
+  };
   auto cb = [this](const std::string &msg) { this->StreamCallback(msg); };
-  if (!func_client_->Stream("Hashtags", args, cb)) { 
+  if (!func_client_->Stream("Hashtags", args, init, cb)) { 
     std::cout << "\nLost connection to the stream.\n";
   }
 }

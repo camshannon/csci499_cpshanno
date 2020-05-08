@@ -2,6 +2,7 @@
 #include <string>
 #include <stdlib.h>
 #include <time.h>
+#include <thread>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -77,5 +78,8 @@ private:
 
   // the func client for making calls to server
   func_client::FuncServiceClient *func_client_;
+
+  // cmd client id
+  std::string client_id_, stream_type_;
 };
 } // namespace cmd
