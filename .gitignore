@@ -55,3 +55,6 @@ project/cpp/kvstore/kvstore_test
 # vagrant
 .vagrant
 *.log
+
+#vscode
+.vscode

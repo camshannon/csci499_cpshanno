@@ -1,11 +1,12 @@
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <time.h>
-
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include <iostream>
+#include <string>
+#include <thread>
 
 #include "func_client.h"
 #include "warble.pb.h"
@@ -27,7 +28,7 @@ using warble::WarbleRequest;
 namespace cmd {
 // the command line tools
 class CommandLine {
-public:
+ public:
   // command line tools constructor
   CommandLine();
 
@@ -65,11 +66,20 @@ public:
   // shows a user's followers and following
   void Profile(const std::string &username);
 
-private:
+  // shows all new warbles with the hashtag
+  void Stream(const std::string &hashtag);
+
+  // gets called when stream is received
+  void StreamCallback(const std::string &msg);
+
+ private:
   // helper function to recurse through thread
   void ReadHelper(const int64_t &id, int count);
 
   // the func client for making calls to server
   func_client::FuncServiceClient *func_client_;
+
+  // cmd client id
+  std::string client_id_, stream_type_;
 };
-} // namespace cmd
+}  // namespace cmd

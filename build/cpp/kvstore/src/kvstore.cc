@@ -47,8 +47,8 @@ void kvstore::KVStore::Put(const std::string &key, const std::string &value) {
 }
 
 // gets all values for a key from the unordered map
-const std::optional<std::vector<std::string>>
-kvstore::KVStore::Get(const std::string &key) {
+const std::optional<std::vector<std::string>> kvstore::KVStore::Get(
+    const std::string &key) {
   std::shared_lock lock(mutex_);
   std::unordered_map<std::string, std::vector<std::string>>::iterator it =
       kvstore_map_.find(key);

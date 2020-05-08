@@ -1,8 +1,8 @@
-#include <cstdio>
+#include "kvstore.h"
 
 #include <gtest/gtest.h>
 
-#include "kvstore.h"
+#include <cstdio>
 
 // get with an unstored element
 TEST(KVStore, GetElementNotFound) {

@@ -1,3 +1,6 @@
+#include <glog/logging.h>
+#include <grpcpp/grpcpp.h>
+
 #include <fstream>
 #include <iterator>
 #include <mutex>
@@ -6,9 +9,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <glog/logging.h>
-#include <grpcpp/grpcpp.h>
 
 #include "kvstore.pb.h"
 
@@ -20,7 +20,7 @@ namespace kvstore {
 
 // the key value store
 class KVStore {
-public:
+ public:
   // read key value store to file
   void ReadFile(const std::string &store);
 
@@ -36,11 +36,11 @@ public:
   // removes all values with a key from kvstore_map_
   void Remove(const std::string &key);
 
-private:
+ private:
   // the unordered map for storing the key value pair
   std::unordered_map<std::string, std::vector<std::string>> kvstore_map_;
 
   // the mutex for obtaining locks on the unordered map
   mutable std::shared_mutex mutex_;
 };
-} // namespace kvstore
+}  // namespace kvstore

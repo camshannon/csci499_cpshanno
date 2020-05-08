@@ -1,11 +1,11 @@
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+#include <grpcpp/grpcpp.h>
+
 #include <csignal>
 #include <memory>
 #include <string>
 #include <thread>
-
-#include <gflags/gflags.h>
-#include <glog/logging.h>
-#include <grpcpp/grpcpp.h>
 
 #include "kvstore.grpc.pb.h"
 #include "kvstore.h"
@@ -28,7 +28,7 @@ namespace kvstore_server {
 
 // the key value store server
 class KeyValueStoreServiceImpl final : public KeyValueStore::Service {
-public:
+ public:
   // key value store server constructor
   KeyValueStoreServiceImpl(const std::string &store);
 
@@ -50,7 +50,7 @@ public:
   Status remove(ServerContext *context, const RemoveRequest *request,
                 RemoveReply *reply) override;
 
-private:
+ private:
   // the key value store for the server
   kvstore::KVStore kvstore_;
 
@@ -60,4 +60,4 @@ private:
 
 // runs the server on port 50000
 void RunServer(KeyValueStoreServiceImpl *service);
-} // namespace kvstore_server
+}  // namespace kvstore_server
