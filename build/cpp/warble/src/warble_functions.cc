@@ -176,18 +176,14 @@ const Any warble_functions::ProfileReplyPackager(
   return any;
 }
 
-static const std::vector<std::string> FindHashtags(const std::string &text) {
+const std::vector<std::string> warble_functions::FindHashtags(const std::string &text) {
   std::vector<std::string> hashtags;
-  std::cout << "in FINDHASHTAGS\n";
-  std::cout << text << std::endl;
   for (size_t i = 0; i < text.length(); ++i) {
     if (text[i] == '#') {
-      std::cout << "FOUND THE HASHTAG CHARACTER\n";
       std::string hash;
       while (!isspace(text[i]) && i < text.length()) {
         hash += text[i++];
       }
-      LOG(INFO) << "Found hashtag :: " << hash;
       hashtags.push_back(hash);
     }
   }

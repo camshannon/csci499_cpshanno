@@ -129,11 +129,14 @@ const Any ProfileReplyPackager(const reply_vector &result);
 // returns a list of clients that should be streamed given the streaming payload
 const std::vector<std::string> StreamHandler(const std::vector<std::pair<std::string, Any>> &clients, const std::string &warble);
 
+// parses the text for all hashtags, defined as the string of 
+// contiguous non-whitespace characters that follow a '#'
+const std::vector<std::string> FindHashtags(const std::string &text);
+
 // the unordered map for associating function names with functions
 //  function names map to request function and reply function
 const function_mapping func_map{
-  {"Registeruser",
-    std::make_pair(RegisteruserRequestPackager, RegisteruserReplyPackager)},
+  {"Registeruser", std::make_pair(RegisteruserRequestPackager, RegisteruserReplyPackager)},
   {"Warble", std::make_pair(WarbleRequestPackager, WarbleReplyPackager)},
   {"Follow", std::make_pair(FollowRequestPackager, FollowReplyPackager)},
   {"Read", std::make_pair(ReadRequestPackager, ReadReplyPackager)},

@@ -13,10 +13,10 @@ TEST(WarbleFunctions, RegisteruserRequestPackager) {
   const auto &followers_put = puts[1];
   EXPECT_EQ(std::get<0>(following_put), 0);
   EXPECT_EQ(std::get<1>(following_put),  "username_0_following");
-  EXPECT_EQ(std::get<2>(following_put), "username_0");
+  EXPECT_EQ(std::get<2>(following_put), "");
   EXPECT_EQ(std::get<0>(followers_put), 0);
   EXPECT_EQ(std::get<1>(followers_put), "username_0_followers");
-  EXPECT_EQ(std::get<2>(followers_put), "username_0");
+  EXPECT_EQ(std::get<2>(followers_put), "");
 }
 
 // test register user reply packager
@@ -202,6 +202,64 @@ TEST(WarbleFunctions, ProfileReply) {
   EXPECT_EQ(following[1], "username_2");
   EXPECT_EQ(followers[0], "username_3");
   EXPECT_EQ(followers[1], "username_4");
+}
+
+// tests the stream handler function
+// which is called when a warble arrives
+TEST(WarbleFunctions, StreamHandler) {
+  // make fake clients
+  std::vector<std::string> hashes({"#one", "#two", "#three"});
+  std::vector<Any> anys;
+  for (auto hash : hashes) {
+    warble::StreamRequest req;
+    req.set_hashtag(hash);
+    Any any;
+    any.PackFrom(req);
+    anys.push_back(any);
+  }
+  std::vector<std::pair<std::string, Any>> clients;
+  for (auto i = 0; i < anys.size(); ++i) {
+    clients.push_back(std::make_pair(std::to_string(i), anys[i]));
+  }
+  Warble w;
+  w.set_text("Contains #one");
+  std::vector<std::string> res = warble_functions::StreamHandler(clients, w.SerializeAsString());
+  EXPECT_EQ(res.size(), 1);
+  EXPECT_EQ(res[0], "0");
+  w.set_text("Contains #two");
+  res = warble_functions::StreamHandler(clients, w.SerializeAsString());
+  EXPECT_EQ(res.size(), 1);
+  EXPECT_EQ(res[0], "1");
+  w.set_text("Contains #three and #two");
+  res = warble_functions::StreamHandler(clients, w.SerializeAsString());
+  EXPECT_EQ(res.size(), 2);
+  EXPECT_TRUE(std::find(res.begin(), res.end(), "1") != res.end());
+  EXPECT_TRUE(std::find(res.begin(), res.end(), "2") != res.end());
+  w.set_text("Contains #4"); // hash that no one is subscribed to
+  res = warble_functions::StreamHandler(clients, w.SerializeAsString());
+  EXPECT_EQ(res.size(), 0);
+}
+
+// test the FindHashtags helper method
+TEST(WarbleFunctions, FindHashtags) {
+  std::string nohash("there are no hashtags");
+  std::string onehash("there is #one hashtag");
+  std::string endhash("this is a hashtag at the #end");
+  std::string tabhash("there is a tab after #this\t hash");
+  std::string multihash("#there #are #tons #of #hashtags in #this #string");
+  std::vector<std::pair<std::string, std::vector<std::string>>> map {
+    std::make_pair(nohash, std::vector<std::string>{}), 
+    std::make_pair(onehash, std::vector<std::string>{"#one"}),
+    std::make_pair(endhash, std::vector<std::string>{"#end"}),
+    std::make_pair(tabhash, std::vector<std::string>{"#this"}),
+    std::make_pair(multihash, std::vector<std::string>{"#there", "#are", "#tons", "#of", "#hashtags", "#this", "#string"})
+  };
+  for (auto pair : map) {
+    auto res = warble_functions::FindHashtags(pair.first);
+    EXPECT_EQ(res.size(), pair.second.size());
+    for (auto r : res) 
+      EXPECT_TRUE(std::find(pair.second.begin(), pair.second.end(), r) != pair.second.end());
+  }
 }
 
 
