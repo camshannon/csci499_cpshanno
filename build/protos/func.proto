@@ -46,9 +46,19 @@ message StreamRequest {
   google.protobuf.Any payload = 2;
 }
 
+message DisconnectRequest {
+  bytes id = 1; // client id
+  bytes type = 2; // stream type
+}
+
+message DisconnectReply {
+  // empty b/c client has already terminated
+}
+
 service FuncService {
   rpc hook (HookRequest) returns (HookReply) {}
   rpc unhook (UnhookRequest) returns (UnhookReply) {}
   rpc event (EventRequest) returns (EventReply) {}
   rpc stream (StreamRequest) returns (stream EventReply) {}
+  rpc disconnect (DisconnectRequest) returns (DisconnectReply) {}
 }
